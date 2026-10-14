@@ -134,12 +134,12 @@ jobs:
 
       - name: Build APK
         working-directory: android
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
 
       - name: Rename APK
         run: |
           mkdir -p apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk apk/foodmunch-customer-${{ github.run_number }}.apk
+          cp android/app/build/outputs/apk/release/app-release.apk apk/foodmunch-customer-${{ github.run_number }}.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

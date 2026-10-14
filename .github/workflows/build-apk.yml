@@ -83,7 +83,7 @@ jobs:
                   "    minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '24')",
                   "    compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '35')",
                   "    targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '34')",
-                  "    kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.25'",
+                  "    kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'",
                   "    ndkVersion = '26.1.10909125'",
                   "}",
                   "",
@@ -119,7 +119,7 @@ jobs:
           android.targetSdkVersion=34
           android.minSdkVersion=24
           android.buildToolsVersion=35.0.0
-          android.kotlinVersion=1.9.25
+          android.kotlinVersion=1.9.24
           EOF
           fi
 

@@ -65,7 +65,7 @@ jobs:
 
       - name: Patch expo-modules Gradle files
         run: |
-          find node_modules/expo-*/android/build.gradle -exec sed -i 's|from components.release|try { from components.release } catch (Exception ignored) {}|g' {} \; 2>/dev/null || true
+          grep -rl "components.release" node_modules/expo-*/android node_modules/expo-modules-core/android --include=*.gradle 2>/dev/null | xargs -r sed -i 's|from components.release|// from components.release|g' || true
           find node_modules/expo-*/android/build.gradle -exec sed -i 's|compileSdkVersion safeExtGet|compileSdk safeExtGet|g; s|minSdkVersion safeExtGet|minSdk safeExtGet|g; s|targetSdkVersion safeExtGet|targetSdk safeExtGet|g' {} \; 2>/dev/null || true
           find node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle -exec sed -i 's|compileSdkVersion project.ext.safeExtGet|compileSdk project.ext.safeExtGet|g; s|minSdkVersion project.ext.safeExtGet|minSdk project.ext.safeExtGet|g; s|targetSdkVersion project.ext.safeExtGet|targetSdk project.ext.safeExtGet|g' {} \; 2>/dev/null || true
 

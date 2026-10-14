@@ -8,3 +8,4 @@ apk/
 .env.*
 !.env.example
 .DS_Store
+Archive.zip

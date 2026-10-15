@@ -6,7 +6,13 @@
  * both modes (colorful banners don't switch).
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Crown, Sparkles, ChevronRight } from 'lucide-react-native';
 
 interface Props {

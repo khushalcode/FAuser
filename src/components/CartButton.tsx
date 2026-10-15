@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Platform, Animated, Easing } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Animated,
+  Easing
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { ShoppingCart, ChevronRight } from 'lucide-react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useCartStore } from '@/store/cart';

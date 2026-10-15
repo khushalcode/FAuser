@@ -4,7 +4,16 @@
  * home screen by visualizing the "8-minute delivery" promise.
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Animated, Easing, Platform, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Easing,
+  Platform,
+  Dimensions
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Bike, MapPin, Clock, ChevronRight } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';
 import { useRouter } from 'expo-router';

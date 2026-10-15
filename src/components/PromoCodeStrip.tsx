@@ -5,8 +5,13 @@
  */
 import React from 'react';
 import {
-  View, Text, Pressable, StyleSheet, Dimensions, Platform
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Platform
 } from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Ticket, Copy, Check } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';
 import { useRouter } from 'expo-router';

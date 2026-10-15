@@ -36,8 +36,14 @@ import { Platform } from 'react-native';
  */
 import React from 'react';
 import {
-  View, Text, Pressable, StyleSheet, Dimensions, Animated, Easing
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Animated,
+  Easing
 } from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { useRouter } from 'expo-router';
 import { ChevronUp, ChevronRight } from 'lucide-react-native';
 import { Image } from 'expo-image';

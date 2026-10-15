@@ -5,7 +5,14 @@
  * when the theme changes. Designed to drop into any header or settings row.
  */
 import React from 'react';
-import { Pressable, View, StyleSheet, Platform, Animated, Easing } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Platform,
+  Animated,
+  Easing
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Sun, Moon } from 'lucide-react-native';
 import { useThemeStore, useThemeColors, useIsDark } from '@/store/theme';
 import { hapticImpact } from '@/utils/platform';

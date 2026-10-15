@@ -7,7 +7,12 @@
  * (works in both modes per design spec).
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Image } from 'expo-image';
 import { ChevronRight } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';

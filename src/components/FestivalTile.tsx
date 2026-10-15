@@ -13,8 +13,12 @@
  */
 import React from 'react';
 import {
-  View, Text, Pressable, StyleSheet, Dimensions
+  View,
+  Text,
+  StyleSheet,
+  Dimensions
 } from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import type { FestivalTileData } from '@/data/mock-data';
 import { useRouter } from 'expo-router';
 

@@ -5,8 +5,13 @@
  */
 import React from 'react';
 import {
-  View, Text, Pressable, StyleSheet, Dimensions, FlatList
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  FlatList
 } from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Image } from 'expo-image';
 import { Clock, Flame, ChevronRight } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';

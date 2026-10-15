@@ -6,7 +6,12 @@
  * saturated accent foregrounds.
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { RefreshCw, Wallet, Tag, MessageCircle } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';
 

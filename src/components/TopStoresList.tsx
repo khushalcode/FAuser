@@ -5,7 +5,14 @@
  * Dark-mode aware — card surface, borders, text + meta colours all adapt.
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, FlatList, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Image as ExpoImage } from 'expo-image';
 import { Star, Clock, MapPin, Bike, BadgePercent, Zap } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';

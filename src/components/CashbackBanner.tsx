@@ -5,7 +5,12 @@
  * per design spec (colorful banners don't switch).
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 
 interface Props {
   onPress?: () => void;

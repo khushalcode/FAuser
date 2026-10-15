@@ -8,7 +8,14 @@ import { Platform } from 'react-native';
  * text remains legible. Only the brand-emerald accents adapt to the theme.
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Animated, Easing } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Easing
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { useThemeColors } from '@/store/theme';
 
 interface Props {

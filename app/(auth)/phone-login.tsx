@@ -1,8 +1,16 @@
 import React from 'react';
 import {
-  View, Text, TextInput, Pressable, KeyboardAvoidingView,
-  Platform, ActivityIndicator, Alert, Animated, Easing
+  View,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Easing
 } from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { Phone, ChevronLeft, ChevronRight, Shield, Lock } from 'lucide-react-native';

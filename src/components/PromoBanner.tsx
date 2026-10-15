@@ -9,7 +9,13 @@
  *   - Brand label visible when brand is supplied (e.g. "Kellogg's")
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import type { PromoBannerData } from '@/data/mock-data';
 import { useRouter } from 'expo-router';
 

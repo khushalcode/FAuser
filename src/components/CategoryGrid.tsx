@@ -7,7 +7,13 @@
  * Dark-mode aware — backgrounds, text colors, tile tints all adapt.
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Image } from 'expo-image';
 import { ChevronRight } from 'lucide-react-native';
 import type { Category } from '@/lib/types';

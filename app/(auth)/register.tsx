@@ -1,8 +1,17 @@
 import React from 'react';
 import {
-  View, Text, TextInput, Pressable, KeyboardAvoidingView,
-  Platform, ActivityIndicator, Alert, ScrollView, Animated, Easing
+  View,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Animated,
+  Easing
 } from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, User, Phone, Eye, EyeOff, ShoppingBasket, Gift, ChevronLeft, Check } from 'lucide-react-native';

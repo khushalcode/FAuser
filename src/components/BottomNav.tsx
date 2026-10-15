@@ -10,7 +10,14 @@
  *   - Routes are unchanged: Home, Categories, Cart, Orders, Account.
  */
 import React from 'react';
-import { View, Pressable, Text, StyleSheet, Platform, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Keyboard
+} from 'react-native';
+import { Pressable } from '@/components/SafePressable';
 import { Home, LayoutGrid, ShoppingCart, ClipboardList, User } from 'lucide-react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

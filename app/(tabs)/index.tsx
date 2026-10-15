@@ -107,6 +107,38 @@ const TAB_ACCENTS: Record<string, string> = {
   bakery: '#8B5CF6'
 };
 
+// Each home section is isolated: if one component throws, only that section
+// disappears instead of crashing the whole home screen.
+class SectionBoundary extends React.Component<
+  { children: React.ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(e: any) {
+    console.warn('[home] section crashed', e);
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
+function Section({ style, children }: { style?: any; children?: React.ReactNode }) {
+  return (
+    <SectionBoundary>
+      <Animated.View style={style}>{children}</Animated.View>
+    </SectionBoundary>
+  );
+}
+
+const safe = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
+  p.catch((e) => {
+    console.warn('[home] request failed', e);
+    return fallback;
+  });
+
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useThemeColors();
@@ -165,19 +197,19 @@ export default function HomeScreen() {
         groceryProds, snackProds, frozenProds, dessertProds, crunchyProds,
         stores
       ] = await Promise.all([
-        api.getBestsellers(),
-        api.getPromoBanners(),
-        api.getCategories(),
-        api.getFeaturedProducts(10),
-        api.getFestivalTiles(),
-        api.getCarouselRows(),
-        api.getHeroBanner('all'),
-        api.getProductsByTag('fresh', 6),
-        api.getProductsByTag('snack', 6),
-        api.getProductsByTag('frozen', 10),
-        api.getProductsByTag('dessert', 10),
-        api.getProductsByTag('snack', 6),
-        api.getStores()
+        safe(api.getBestsellers(), [] as any[]),
+        safe(api.getPromoBanners(), [] as any[]),
+        safe(api.getCategories(), [] as any[]),
+        safe(api.getFeaturedProducts(10), [] as any[]),
+        safe(api.getFestivalTiles(), [] as any[]),
+        safe(api.getCarouselRows(), [] as any[]),
+        safe(api.getHeroBanner('all'), undefined as any),
+        safe(api.getProductsByTag('fresh', 6), [] as any[]),
+        safe(api.getProductsByTag('snack', 6), [] as any[]),
+        safe(api.getProductsByTag('frozen', 10), [] as any[]),
+        safe(api.getProductsByTag('dessert', 10), [] as any[]),
+        safe(api.getProductsByTag('snack', 6), [] as any[]),
+        safe(api.getStores(), [] as any[])
       ]);
 
       setBestsellers(bs);
@@ -201,7 +233,7 @@ export default function HomeScreen() {
       setFeatured(featuredProds);
       setFestivalTiles(ftiles);
       setCarouselRows(crows);
-      setHeroBanners([hero]); // single hero per tab (could be expanded later)
+      setHeroBanners(hero ? [hero] : []);
       setGridProducts(crunchyProds);
 
       // Recently viewed — use featured + bestsellers as a proxy
@@ -211,8 +243,8 @@ export default function HomeScreen() {
       // Carousel row products — fetch in parallel for each row.
       const cp: Record<string, Product[]> = {};
       await Promise.all(
-        crows.map(async (r) => {
-          cp[r.id] = await api.getProductsForCarouselRow(r, 12);
+        crows.map(async (r: any) => {
+          cp[r.id] = await safe(api.getProductsForCarouselRow(r, 12), [] as any[]);
         })
       );
       setCarouselProducts(cp);
@@ -294,10 +326,14 @@ export default function HomeScreen() {
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             {
-              useNativeDriver: Platform.OS !== 'web',
+              // MUST be false: scrollY drives StickyHeader's backgroundColor and
+              // shadowOpacity, which the native driver can't animate. Mixing
+              // native + JS drivers on one node crashes release APKs.
+              useNativeDriver: false,
               listener: (e: any) => {
                 const y = e.nativeEvent?.contentOffset?.y ?? 0;
-                setShowBackToTop(y > 700);
+                const next = y > 700;
+                setShowBackToTop((prev) => (prev === next ? prev : next));
               }
             }
           )}
@@ -306,21 +342,21 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: 28 }}
         >
           {/* Section 4: Hero Banner Carousel */}
-          <Animated.View style={[styles.heroWrap, fadeOpacity(1)]}>
+          <Section style={[styles.heroWrap, fadeOpacity(1)]}>
             {heroBanners.length > 0 ? (
               <HeroCarousel banners={heroBanners} />
             ) : (
               <SkeletonShimmer width="100%" height={140} radius={16} />
             )}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Delivery Promise Banner (8-min delivery highlight) */}
-          <Animated.View style={fadeOpacity(1)}>
+          <Section style={fadeOpacity(1)}>
             <DeliveryPromiseBanner />
-          </Animated.View>
+          </Section>
 
           {/* NEW: Live Order Banner */}
-          <Animated.View style={fadeOpacity(1)}>
+          <Section style={fadeOpacity(1)}>
             <View style={{ marginTop: 12 }}>
               <LiveOrderBanner
                 storeName="Biryani Blues"
@@ -329,37 +365,37 @@ export default function HomeScreen() {
                 onPress={() => router.push('/order/o1')}
               />
             </View>
-          </Animated.View>
+          </Section>
 
           {/* NEW: Quick Actions Grid */}
-          <Animated.View style={fadeOpacity(2)}>
+          <Section style={fadeOpacity(2)}>
             <QuickActionsGrid onPress={(a) => {
               if (a.id === 'reorder') router.push('/(tabs)/orders');
               else if (a.id === 'wallet') router.push('/wallet');
               else if (a.id === 'offers') router.push('/coupons');
               else if (a.id === 'help') router.push('/chat');
             }} />
-          </Animated.View>
+          </Section>
 
           {/* NEW: Stats Strip */}
-          <Animated.View style={fadeOpacity(2)}>
+          <Section style={fadeOpacity(2)}>
             <View style={{ marginTop: 14 }}>
               <StatsStrip />
             </View>
-          </Animated.View>
+          </Section>
 
           {/* NEW: Live Delivery Tracker (animated route) */}
-          <Animated.View style={fadeOpacity(3)}>
+          <Section style={fadeOpacity(3)}>
             <LiveDeliveryTracker />
-          </Animated.View>
+          </Section>
 
           {/* NEW: Offers Strip */}
-          <Animated.View style={fadeOpacity(3)}>
+          <Section style={fadeOpacity(3)}>
             <OffersStrip onPress={() => router.push('/coupons')} />
-          </Animated.View>
+          </Section>
 
           {/* Section 5: Bestsellers Grid (3x2) */}
-          <Animated.View style={fadeOpacity(4)}>
+          <Section style={fadeOpacity(4)}>
             {loading ? (
               <View style={styles.section}>
                 <View style={styles.skelHeader}>
@@ -376,20 +412,20 @@ export default function HomeScreen() {
                 }
               />
             )}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Brands Strip */}
-          <Animated.View style={fadeOpacity(4)}>
+          <Section style={fadeOpacity(4)}>
             <BrandsStrip onPress={() => router.push('/search')} />
-          </Animated.View>
+          </Section>
 
           {/* Section 6: Promo Banner #1 — "Stock up on snack time!" */}
-          <Animated.View style={fadeOpacity(5)}>
+          <Section style={fadeOpacity(5)}>
             {promoBanners[0] ? <PromoBanner banner={promoBanners[0]} /> : null}
-          </Animated.View>
+          </Section>
 
           {/* Section 7: Grocery & Kitchen Category Grid */}
-          <Animated.View style={fadeOpacity(6)}>
+          <Section style={fadeOpacity(6)}>
             {loading ? (
               <View style={styles.section}>
                 <View style={styles.skelHeader}>
@@ -412,25 +448,25 @@ export default function HomeScreen() {
                 }
               />
             )}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Top Restaurants List (Zomato-style) */}
-          <Animated.View style={fadeOpacity(7)}>
+          <Section style={fadeOpacity(7)}>
             {!loading && allStores.length > 0 && (
               <TopStoresList
                 stores={allStores.slice(0, 4)}
                 onPress={(s) => router.push(`/store/${s.id}`)}
               />
             )}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Trending Recipes — cook tonight's dinner */}
-          <Animated.View style={fadeOpacity(7)}>
+          <Section style={fadeOpacity(7)}>
             <TrendingRecipes />
-          </Animated.View>
+          </Section>
 
           {/* Section 8: Featured This Week — blue-bordered carousel */}
-          <Animated.View style={fadeOpacity(8)}>
+          <Section style={fadeOpacity(8)}>
             {loading ? (
               <View style={styles.section}>
                 <View style={styles.skelHeader}>
@@ -446,22 +482,22 @@ export default function HomeScreen() {
                 onSeeAll={() => router.push('/search')}
               />
             )}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Cashback Banner */}
-          <Animated.View style={fadeOpacity(8)}>
+          <Section style={fadeOpacity(8)}>
             <View style={{ marginTop: 16 }}>
               <CashbackBanner onPress={() => router.push('/wallet')} />
             </View>
-          </Animated.View>
+          </Section>
 
           {/* Section 9: Festival Tile #1 (Navratri — orange/yellow) */}
-          <Animated.View style={fadeOpacity(9)}>
+          <Section style={fadeOpacity(9)}>
             {festivalTiles[0] ? <FestivalTile tile={festivalTiles[0]} /> : null}
-          </Animated.View>
+          </Section>
 
           {/* Section 10: Product Carousel Row (frozen desserts, with chips) */}
-          <Animated.View style={fadeOpacity(10)}>
+          <Section style={fadeOpacity(10)}>
             {carouselRows[0] ? (
               <ProductCarouselRow
                 title={carouselRows[0].title}
@@ -474,17 +510,17 @@ export default function HomeScreen() {
                 onSeeAll={() => router.push('/search')}
               />
             ) : null}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Membership Card */}
-          <Animated.View style={fadeOpacity(10)}>
+          <Section style={fadeOpacity(10)}>
             <View style={{ marginTop: 16 }}>
               <MembershipCard onPress={() => router.push('/wallet')} />
             </View>
-          </Animated.View>
+          </Section>
 
           {/* Section 11: Snacks & Drinks Category Grid */}
-          <Animated.View style={fadeOpacity(11)}>
+          <Section style={fadeOpacity(11)}>
             {loading ? (
               <View style={styles.section}>
                 <View style={styles.skelHeader}>
@@ -508,15 +544,15 @@ export default function HomeScreen() {
                 }
               />
             )}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Active Coupons Strip */}
-          <Animated.View style={fadeOpacity(11)}>
+          <Section style={fadeOpacity(11)}>
             <PromoCodeStrip />
-          </Animated.View>
+          </Section>
 
           {/* Section 12: Product Grid — Stock up on crunchy snacks */}
-          <Animated.View style={fadeOpacity(12)}>
+          <Section style={fadeOpacity(12)}>
             {loading ? (
               <View style={styles.section}>
                 <View style={styles.skelHeader}>
@@ -536,26 +572,26 @@ export default function HomeScreen() {
                 isLoading={false}
               />
             )}
-          </Animated.View>
+          </Section>
 
           {/* NEW: Recently Viewed Strip */}
-          <Animated.View style={fadeOpacity(13)}>
+          <Section style={fadeOpacity(13)}>
             {!loading && recentlyViewed.length > 0 && (
               <RecentlyViewedStrip
                 products={recentlyViewed}
                 onPress={(p) => router.push(`/product/${p.id}`)}
               />
             )}
-          </Animated.View>
+          </Section>
 
           {/* Section 13: Festival Tile #2 — Durga Pujo Bazar (red themed) */}
-          <Animated.View style={fadeOpacity(14)}>
+          <Section style={fadeOpacity(14)}>
             {festivalTiles[1] ? <FestivalTile tile={festivalTiles[1]} /> : null}
-          </Animated.View>
+          </Section>
 
           {/* Extra: Additional Product Carousel Rows (admin-configured) */}
           {carouselRows.slice(1).map((row, i) => (
-            <Animated.View key={row.id} style={fadeOpacity(14 + i + 1)}>
+            <Section key={row.id} style={fadeOpacity(14 + i + 1)}>
               <ProductCarouselRow
                 title={row.title}
                 subtitle={row.subtitle}
@@ -565,14 +601,14 @@ export default function HomeScreen() {
                 chips={row.chips}
                 onSeeAll={() => router.push('/search')}
               />
-            </Animated.View>
+            </Section>
           ))}
 
           {/* Extra: Second promo banner (Kellogg's brand ad) for variety */}
           {promoBanners[1] ? (
-            <Animated.View style={fadeOpacity(TOTAL_STAGES)}>
+            <Section style={fadeOpacity(TOTAL_STAGES)}>
               <PromoBanner banner={promoBanners[1]} />
-            </Animated.View>
+            </Section>
           ) : null}
 
           {/* Section 14: See all products pill at the bottom */}

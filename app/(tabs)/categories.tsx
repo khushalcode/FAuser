@@ -4,7 +4,7 @@ import { View, Text, FlatList, Pressable, ActivityIndicator, ScrollView, StyleSh
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Search, TrendingUp } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import type { Category, Store } from '@/lib/types';
 import { StoreCard } from '@/components/StoreCard';
@@ -28,6 +28,7 @@ const GROUPS = [
 
 export default function CategoriesScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const [cats, setCats] = React.useState<Category[]>([]);
   const [stores, setStores] = React.useState<Store[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -62,14 +63,15 @@ export default function CategoriesScreen() {
       <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
         {/* Header */}
         <View className="px-5 pt-2 pb-3">
-          <Text className="text-textmain text-[22px] font-extrabold tracking-tight">All Categories</Text>
-          <Text className="text-muted text-sm mt-0.5">Browse all food and grocery categories</Text>
+          <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>All Categories</Text>
+          <Text className="text-muted text-sm mt-0.5" style={{ color: colors.textMuted }}>Browse all food and grocery categories</Text>
         </View>
 
         {/* Search bar */}
         <Pressable
           onPress={() => router.push('/search')}
           className="mx-5 mb-3 flex-row items-center bg-surface rounded-xl2 px-3.5 py-3 border border-line"
+          style={{ backgroundColor: colors.surface, borderColor: colors.border }}
         >
           <Search size={18} color={colors.textMuted} />
           <Text className="ml-2.5 text-sm" style={{ color: colors.textMuted }}>
@@ -113,7 +115,7 @@ export default function CategoriesScreen() {
         {loading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator color={colors.primary} size="large" />
-            <Text className="text-muted text-xs mt-2">Loading categories...</Text>
+            <Text className="text-muted text-xs mt-2" style={{ color: colors.textMuted }}>Loading categories...</Text>
           </View>
         ) : (
           <FlatList
@@ -166,7 +168,7 @@ export default function CategoriesScreen() {
                   <Pressable
                     onPress={() => router.push(`/search?q=${encodeURIComponent(item.name)}`)}
                     className="bg-white rounded-xl2 border border-line p-4 active:opacity-80"
-                    style={{ shadowColor: '#0F172A', shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
+                    style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
                   >
                     <View
                       className="w-14 h-14 rounded-2xl items-center justify-center"
@@ -174,7 +176,7 @@ export default function CategoriesScreen() {
                     >
                       <Text className="text-3xl">{EMOJI[item.slug] || '📦'}</Text>
                     </View>
-                    <Text className="text-textmain font-semibold text-sm mt-2.5" numberOfLines={2}>
+                    <Text className="text-textmain font-semibold text-sm mt-2.5" style={{ color: colors.text }} numberOfLines={2}>
                       {item.name}
                     </Text>
                     <View className="flex-row items-center mt-1.5">
@@ -185,7 +187,7 @@ export default function CategoriesScreen() {
                           </Text>
                         </View>
                       )}
-                      <Text className="text-muted text-[11px]">{item.items_count} items</Text>
+                      <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>{item.items_count} items</Text>
                     </View>
                   </Pressable>
                 </Animated.View>

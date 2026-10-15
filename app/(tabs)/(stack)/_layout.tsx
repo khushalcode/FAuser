@@ -9,9 +9,10 @@
  */
 import React from 'react';
 import { Stack } from 'expo-router';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 export default function StackLayout() {
+  const colors = useThemeColors();
   return (
     <Stack
       screenOptions={{

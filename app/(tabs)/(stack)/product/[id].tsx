@@ -7,7 +7,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import {
   ArrowLeft, Star, Heart, Share2, Clock, Minus, Plus, ShoppingBag, ChevronRight
 } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import type { Product, Store, Review } from '@/lib/types';
 import { useCartStore } from '@/store/cart';
@@ -21,6 +21,7 @@ import { hapticImpact, hapticNotify } from '@/utils/platform';
 export default function ProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const colors = useThemeColors();
   const [product, setProduct] = React.useState<Product | null>(null);
   const [store, setStore] = React.useState<Store | null>(null);
   const [related, setRelated] = React.useState<Product[]>([]);
@@ -141,44 +142,44 @@ export default function ProductScreen() {
           )}
         </View>
 
-        <View className="bg-white px-5 py-4">
+        <View className="bg-white px-5 py-4" style={{ backgroundColor: colors.surfaceElevated }}>
           {product.brand && (
-            <Text className="text-[11px] text-muted uppercase tracking-wide font-medium">
+            <Text className="text-[11px] text-muted uppercase tracking-wide font-medium" style={{ color: colors.textMuted }}>
               {product.brand}
             </Text>
           )}
-          <Text className="text-textmain text-[22px] font-extrabold tracking-tight mt-0.5">{product.name}</Text>
-          <Text className="text-muted text-sm mt-1">{product.unit}{isFood && product.prep_time_minutes ? ` • ${product.prep_time_minutes} min prep` : ''}</Text>
+          <Text className="text-textmain text-[22px] font-extrabold tracking-tight mt-0.5" style={{ color: colors.text }}>{product.name}</Text>
+          <Text className="text-muted text-sm mt-1" style={{ color: colors.textMuted }}>{product.unit}{isFood && product.prep_time_minutes ? ` • ${product.prep_time_minutes} min prep` : ''}</Text>
 
           <View className="flex-row items-center mt-2.5">
             <View className="flex-row items-center px-2 py-1 rounded-md mr-2" style={{ backgroundColor: colors.primaryLight }}>
               <Star size={12} color={colors.primary} fill={colors.primary} />
-              <Text className="text-primary text-xs font-bold ml-0.5">{product.rating.toFixed(1)}</Text>
+              <Text className="text-primary text-xs font-bold ml-0.5" style={{ color: colors.primary }}>{product.rating.toFixed(1)}</Text>
             </View>
-            <Text className="text-muted text-xs">{product.reviews_count} ratings</Text>
+            <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>{product.reviews_count} ratings</Text>
             {isFood && (
               <View className="ml-auto flex-row items-center px-2 py-1 rounded-md" style={{ backgroundColor: colors.warningLight }}>
                 <Clock size={11} color={colors.warning} />
-                <Text className="text-warning text-xs font-semibold ml-0.5">{product.prep_time_minutes} min</Text>
+                <Text className="text-warning text-xs font-semibold ml-0.5" style={{ color: colors.warning }}>{product.prep_time_minutes} min</Text>
               </View>
             )}
           </View>
 
           <View className="flex-row items-end mt-3">
-            <Text className="text-textmain text-2xl font-bold">{formatCurrency(effPrice)}</Text>
+            <Text className="text-textmain text-2xl font-bold" style={{ color: colors.text }}>{formatCurrency(effPrice)}</Text>
             {product.discount_price && (
               <>
-                <Text className="text-muted text-sm line-through ml-2 mb-0.5">{formatCurrency(product.price)}</Text>
-                <Text className="text-success text-xs font-bold ml-2 mb-1">You save {formatCurrency(product.price - effPrice)}</Text>
+                <Text className="text-muted text-sm line-through ml-2 mb-0.5" style={{ color: colors.textMuted }}>{formatCurrency(product.price)}</Text>
+                <Text className="text-success text-xs font-bold ml-2 mb-1" style={{ color: colors.success }}>You save {formatCurrency(product.price - effPrice)}</Text>
               </>
             )}
           </View>
         </View>
 
         {/* About */}
-        <View className="bg-white px-5 py-4 mt-2 border-t border-line">
-          <Text className="text-textmain font-bold text-sm">About this item</Text>
-          <Text className="text-muted text-sm mt-2 leading-5">
+        <View className="bg-white px-5 py-4 mt-2 border-t border-line" style={{ backgroundColor: colors.surfaceElevated, borderTopColor: colors.border }}>
+          <Text className="text-textmain font-bold text-sm" style={{ color: colors.text }}>About this item</Text>
+          <Text className="text-muted text-sm mt-2 leading-5" style={{ color: colors.textMuted }}>
             {product.description}
           </Text>
 
@@ -195,42 +196,42 @@ export default function ProductScreen() {
           {/* Highlights */}
           <View className="mt-3 p-3 rounded-xl2" style={{ backgroundColor: colors.surface }}>
             <View className="flex-row justify-between">
-              <Text className="text-muted text-xs">Stock</Text>
-              <Text className="text-textmain text-xs font-semibold">{product.stock > 20 ? 'In stock' : `Only ${product.stock} left`}</Text>
+              <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Stock</Text>
+              <Text className="text-textmain text-xs font-semibold" style={{ color: colors.text }}>{product.stock > 20 ? 'In stock' : `Only ${product.stock} left`}</Text>
             </View>
             <View className="flex-row justify-between mt-1.5">
-              <Text className="text-muted text-xs">Sold by</Text>
+              <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Sold by</Text>
               <Pressable onPress={() => store && router.push(`/store/${store.id}`)} className="flex-row items-center">
-                <Text className="text-primary text-xs font-semibold">{store?.name}</Text>
+                <Text className="text-primary text-xs font-semibold" style={{ color: colors.primary }}>{store?.name}</Text>
                 <ChevronRight size={11} color={colors.primary} />
               </Pressable>
             </View>
             {product.barcode && (
               <View className="flex-row justify-between mt-1.5">
-                <Text className="text-muted text-xs">Barcode</Text>
-                <Text className="text-textmain text-xs">{product.barcode}</Text>
+                <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Barcode</Text>
+                <Text className="text-textmain text-xs" style={{ color: colors.text }}>{product.barcode}</Text>
               </View>
             )}
           </View>
         </View>
 
         {/* Reviews */}
-        <View className="bg-white px-5 py-4 mt-2 border-t border-line">
-          <Text className="text-textmain font-bold text-sm mb-3">Ratings & Reviews</Text>
+        <View className="bg-white px-5 py-4 mt-2 border-t border-line" style={{ backgroundColor: colors.surfaceElevated, borderTopColor: colors.border }}>
+          <Text className="text-textmain font-bold text-sm mb-3" style={{ color: colors.text }}>Ratings & Reviews</Text>
           {reviews.length === 0 ? (
-            <Text className="text-muted text-sm">No reviews yet. Be the first to review!</Text>
+            <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>No reviews yet. Be the first to review!</Text>
           ) : (
             reviews.map((r) => (
-              <View key={r.id} className="pb-3 mb-3 border-b border-lineLight">
+              <View key={r.id} className="pb-3 mb-3 border-b border-lineLight" style={{ borderBottomColor: colors.borderLight }}>
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-textmain text-sm font-semibold">{r.customer_name}</Text>
+                  <Text className="text-textmain text-sm font-semibold" style={{ color: colors.text }}>{r.customer_name}</Text>
                   <View className="flex-row items-center px-1.5 py-0.5 rounded-md" style={{ backgroundColor: colors.primaryLight }}>
                     <Star size={10} color={colors.primary} fill={colors.primary} />
-                    <Text className="text-primary text-[11px] font-bold ml-0.5">{r.rating}</Text>
+                    <Text className="text-primary text-[11px] font-bold ml-0.5" style={{ color: colors.primary }}>{r.rating}</Text>
                   </View>
                 </View>
-                <Text className="text-muted text-xs mt-1.5">{r.comment}</Text>
-                <Text className="text-subtle text-[10px] mt-1">{formatDate(r.created_at)}</Text>
+                <Text className="text-muted text-xs mt-1.5" style={{ color: colors.textMuted }}>{r.comment}</Text>
+                <Text className="text-subtle text-[10px] mt-1" style={{ color: colors.textSubtle }}>{formatDate(r.created_at)}</Text>
               </View>
             ))
           )}
@@ -239,8 +240,8 @@ export default function ProductScreen() {
         {/* Related */}
         {related.length > 0 && store && (
           <View className="mt-2 pb-32">
-            <View className="px-5 py-4 bg-white border-t border-line">
-              <Text className="text-textmain font-bold text-sm">You may also like</Text>
+            <View className="px-5 py-4 bg-white border-t border-line" style={{ backgroundColor: colors.surfaceElevated, borderTopColor: colors.border }}>
+              <Text className="text-textmain font-bold text-sm" style={{ color: colors.text }}>You may also like</Text>
             </View>
             <View className="px-5 pt-2 flex-row flex-wrap justify-between">
               {related.map((p) => (
@@ -254,14 +255,14 @@ export default function ProductScreen() {
       {/* Sticky bottom bar */}
       <View
         className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-3 pb-4 border-t border-line"
-        style={{ borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 8, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 12 }}
+        style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 8, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12 }}
       >
         <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center bg-surface rounded-xl2 overflow-hidden border border-line">
+          <View className="flex-row items-center bg-surface rounded-xl2 overflow-hidden border border-line" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
             <Pressable onPress={() => setQuantity((q) => Math.max(1, q - 1))} className="w-10 h-10 items-center justify-center">
               <Minus size={14} color={colors.primaryDark} strokeWidth={3} />
             </Pressable>
-            <Text className="font-bold text-textmain" style={{ width: 32, textAlign: 'center' }}>{quantity}</Text>
+            <Text className="font-bold text-textmain" style={{ width: 32, textAlign: 'center', color: colors.text }}>{quantity}</Text>
             <Pressable onPress={() => setQuantity((q) => q + 1)} className="w-10 h-10 items-center justify-center">
               <Plus size={14} color={colors.primaryDark} strokeWidth={3} />
             </Pressable>
@@ -273,8 +274,8 @@ export default function ProductScreen() {
             style={{ backgroundColor: colors.primaryLight }}
           >
             <ShoppingBag size={15} color={colors.primary} />
-            <Text className="text-primary font-semibold text-sm ml-1.5">Add to Cart</Text>
-            <Text className="text-primary font-bold text-sm ml-2">• {formatCurrency(effPrice * quantity)}</Text>
+            <Text className="text-primary font-semibold text-sm ml-1.5" style={{ color: colors.primary }}>Add to Cart</Text>
+            <Text className="text-primary font-bold text-sm ml-2" style={{ color: colors.primary }}>• {formatCurrency(effPrice * quantity)}</Text>
           </Pressable>
         </View>
 
@@ -298,19 +299,20 @@ function Header({
   onFav?: () => void;
   isFav?: boolean;
 }) {
+  const colors = useThemeColors();
   return (
     <View className="absolute top-0 left-0 right-0 z-10 flex-row items-center justify-between px-4 pt-2">
-      <Pressable onPress={onBack} className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 4 }}>
+      <Pressable onPress={onBack} className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ backgroundColor: colors.surfaceElevated, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 }}>
         <ArrowLeft size={18} color={colors.text} />
       </Pressable>
       <View className="flex-row">
         {onShare && (
-          <Pressable onPress={onShare} className="w-9 h-9 rounded-full items-center justify-center bg-white mr-2" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 4 }}>
+          <Pressable onPress={onShare} className="w-9 h-9 rounded-full items-center justify-center bg-white mr-2" style={{ backgroundColor: colors.surfaceElevated, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 }}>
             <Share2 size={16} color={colors.text} />
           </Pressable>
         )}
         {onFav && (
-          <Pressable onPress={onFav} className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 4 }}>
+          <Pressable onPress={onFav} className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ backgroundColor: colors.surfaceElevated, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 }}>
             <Heart size={16} color={isFav ? colors.error : colors.text} fill={isFav ? colors.error : 'transparent'} />
           </Pressable>
         )}

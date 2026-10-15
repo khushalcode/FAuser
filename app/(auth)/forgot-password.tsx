@@ -6,11 +6,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Mail, ChevronLeft, CheckCircle, Phone, Key } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useAuthStore } from '@/store/auth';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const reset = useAuthStore((s) => s.resetPassword);
   const isLoading = useAuthStore((s) => s.isLoading);
   const [email, setEmail] = React.useState('');
@@ -95,8 +96,8 @@ export default function ForgotPasswordScreen() {
         <Animated.View style={{ opacity: fadeAnim }} className="px-6 pt-6 flex-1">
           {!sent ? (
             <>
-              <Text className="text-textmain text-sm font-medium mb-1.5">Email Address</Text>
-              <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line">
+              <Text className="text-textmain text-sm font-medium mb-1.5" style={{ color: colors.text }}>Email Address</Text>
+              <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
                 <Mail size={18} color={colors.textMuted} />
                 <TextInput
                   value={email}
@@ -106,6 +107,7 @@ export default function ForgotPasswordScreen() {
                   autoCapitalize="none"
                   keyboardType="email-address"
                   className="flex-1 ml-2.5 text-sm text-textmain"
+                  style={{ color: colors.text }}
                 />
               </View>
 
@@ -142,13 +144,13 @@ export default function ForgotPasswordScreen() {
                   alignItems: 'center',
                   borderWidth: 1,
                   borderColor: colors.border,
-                  backgroundColor: '#fff',
+                  backgroundColor: colors.surfaceElevated,
                   flexDirection: 'row',
                   justifyContent: 'center',
                 }}
               >
                 <Phone size={16} color={colors.text} />
-                <Text className="text-textmain font-medium text-sm ml-2">Reset via Phone OTP instead</Text>
+                <Text className="text-textmain font-medium text-sm ml-2" style={{ color: colors.text }}>Reset via Phone OTP instead</Text>
               </Pressable>
             </>
           ) : (
@@ -200,9 +202,9 @@ export default function ForgotPasswordScreen() {
           )}
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 24, marginBottom: 16 }}>
-            <Text className="text-muted text-sm">Remember your password? </Text>
+            <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>Remember your password? </Text>
             <Link href="/login">
-              <Text className="text-primary text-sm font-semibold">Sign In</Text>
+              <Text className="text-primary text-sm font-semibold" style={{ color: colors.primary }}>Sign In</Text>
             </Link>
           </View>
         </Animated.View>

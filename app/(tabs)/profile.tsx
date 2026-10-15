@@ -7,9 +7,10 @@ import { useRouter } from 'expo-router';
 import {
   MapPin, Heart, Tag, Wallet, Bell, MessageSquare,
   Settings, LogOut, ChevronRight, Gift, Star, ShoppingBag,
-  HelpCircle, Shield, Award, ShoppingBasket, Camera
+  HelpCircle, Shield, Award, ShoppingBasket, Camera, Moon
 } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
 import { useCartStore } from '@/store/cart';
@@ -23,6 +24,7 @@ export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
   const isMockMode = useAuthStore((s) => s.isMockMode);
+  const colors = useThemeColors();
   const walletBalance = useUserStore((s) => s.walletBalance);
   const loyaltyPoints = useUserStore((s) => s.loyaltyPoints);
   const loyaltyTier = useUserStore((s) => s.loyaltyTier);
@@ -158,32 +160,32 @@ export default function ProfileScreen() {
         {/* Loyalty + wallet cards */}
         <View className="px-5 -mt-12">
           <View className="flex-row">
-            <View className="flex-1 bg-white rounded-xl2 p-3.5 mr-2 border border-line" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.08, shadowRadius: 6 }}>
+            <View className="flex-1 bg-white rounded-xl2 p-3.5 mr-2 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, elevation: 2, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6 }}>
               <View className="flex-row items-center">
                 <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
                   <Wallet size={16} color={colors.primary} />
                 </View>
                 <View className="ml-2">
-                  <Text className="text-muted text-[11px]">Wallet</Text>
-                  <Text className="text-textmain font-bold text-base">{formatCurrency(walletBalance)}</Text>
+                  <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>Wallet</Text>
+                  <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>{formatCurrency(walletBalance)}</Text>
                 </View>
               </View>
               <Pressable onPress={() => router.push('/wallet')} className="mt-2">
-                <Text className="text-primary text-xs font-semibold">View →</Text>
+                <Text className="text-primary text-xs font-semibold" style={{ color: colors.primary }}>View →</Text>
               </Pressable>
             </View>
 
-            <View className="flex-1 bg-white rounded-xl2 p-3.5 ml-2 border border-line" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.08, shadowRadius: 6 }}>
+            <View className="flex-1 bg-white rounded-xl2 p-3.5 ml-2 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, elevation: 2, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6 }}>
               <View className="flex-row items-center">
                 <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: colors.warningLight }}>
                   <Award size={16} color={colors.warning} />
                 </View>
                 <View className="ml-2">
-                  <Text className="text-muted text-[11px]">{loyaltyTier} Tier</Text>
-                  <Text className="text-textmain font-bold text-base">{loyaltyPoints} pts</Text>
+                  <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>{loyaltyTier} Tier</Text>
+                  <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>{loyaltyPoints} pts</Text>
                 </View>
               </View>
-              <View className="mt-2 h-1 rounded-full bg-line overflow-hidden">
+              <View className="mt-2 h-1 rounded-full bg-line overflow-hidden" style={{ backgroundColor: colors.borderLight }}>
                 <View style={{ width: `${loyaltyProgress * 100}%`, height: '100%', backgroundColor: colors.warning }} />
               </View>
             </View>
@@ -192,57 +194,68 @@ export default function ProfileScreen() {
 
         {/* Stats row */}
         <View className="px-5 mt-4">
-          <View className="flex-row bg-white rounded-xl2 border border-line">
-            <StatCell icon={<ShoppingBag size={14} color={colors.primary} />} label="Orders" value="24" />
+          <View className="flex-row bg-white rounded-xl2 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <StatCell icon={<ShoppingBag size={14} color={colors.primary} />} label="Orders" value="24" colors={colors} />
             <View style={{ width: 1, backgroundColor: colors.border }} />
-            <StatCell icon={<Star size={14} color={colors.warning} />} label="Reviews" value="12" />
+            <StatCell icon={<Star size={14} color={colors.warning} />} label="Reviews" value="12" colors={colors} />
             <View style={{ width: 1, backgroundColor: colors.border }} />
-            <StatCell icon={<Heart size={14} color={colors.error} />} label="Favourites" value="8" />
+            <StatCell icon={<Heart size={14} color={colors.error} />} label="Favourites" value="8" colors={colors} />
             <View style={{ width: 1, backgroundColor: colors.border }} />
-            <StatCell icon={<Gift size={14} color={colors.info} />} label="Coupons" value="5" />
+            <StatCell icon={<Gift size={14} color={colors.info} />} label="Coupons" value="5" colors={colors} />
           </View>
         </View>
 
         {/* Menu */}
         <View className="px-5 mt-5">
-          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mb-2">Account</Text>
-          <View className="bg-white rounded-xl2 border border-line overflow-hidden">
-            <MenuRow icon={<MapPin size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Saved Addresses" onPress={() => router.push('/address')} />
-            <Divider />
-            <MenuRow icon={<Heart size={18} color={colors.error} />} iconBg={colors.errorLight} title="Favourites" onPress={() => router.push('/favourites')} />
-            <Divider />
-            <MenuRow icon={<Tag size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Coupons & Offers" onPress={() => router.push('/coupons')} />
-            <Divider />
-            <MenuRow icon={<Wallet size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Wallet & Transactions" onPress={() => router.push('/wallet')} />
+          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mb-2" style={{ color: colors.textMuted }}>Account</Text>
+          <View className="bg-white rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <MenuRow icon={<MapPin size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Saved Addresses" onPress={() => router.push('/address')} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Heart size={18} color={colors.error} />} iconBg={colors.errorLight} title="Favourites" onPress={() => router.push('/favourites')} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Tag size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Coupons & Offers" onPress={() => router.push('/coupons')} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Wallet size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Wallet & Transactions" onPress={() => router.push('/wallet')} colors={colors} />
           </View>
 
-          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mt-5 mb-2">Preferences</Text>
-          <View className="bg-white rounded-xl2 border border-line overflow-hidden">
-            <MenuRow icon={<Bell size={18} color={colors.info} />} iconBg={colors.infoLight} title="Notifications" onPress={() => router.push('/notifications')} />
-            <Divider />
-            <MenuRow icon={<MessageSquare size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Chat Support" onPress={() => router.push('/chat')} />
-            <Divider />
-            <MenuRow icon={<HelpCircle size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Help & FAQ" onPress={() => router.push('/chat')} />
-            <Divider />
-            <MenuRow icon={<Shield size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Privacy & Security" />
-            <Divider />
-            <MenuRow icon={<Settings size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Settings" />
+          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mt-5 mb-2" style={{ color: colors.textMuted }}>Preferences</Text>
+          <View className="bg-white rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <View className="flex-row items-center px-3.5 py-3">
+              <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
+                <Moon size={18} color={colors.primary} />
+              </View>
+              <View className="flex-1 ml-3">
+                <Text className="text-textmain text-sm font-medium" style={{ color: colors.text }}>Dark Mode</Text>
+                <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>Toggle light or dark theme</Text>
+              </View>
+              <ThemeToggle size="md" />
+            </View>
+            <Divider colors={colors} />
+            <MenuRow icon={<Bell size={18} color={colors.info} />} iconBg={colors.infoLight} title="Notifications" onPress={() => router.push('/notifications')} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<MessageSquare size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Chat Support" onPress={() => router.push('/chat')} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<HelpCircle size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Help & FAQ" onPress={() => router.push('/chat')} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Shield size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Privacy & Security" colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Settings size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Settings" colors={colors} />
           </View>
 
-          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mt-5 mb-2">Rewards</Text>
-          <View className="bg-white rounded-xl2 border border-line overflow-hidden">
-            <MenuRow icon={<Gift size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Refer & Earn" subtitle="Get ₹100 for every friend" onPress={onShare} />
-            <Divider />
-            <MenuRow icon={<Award size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Loyalty Program" subtitle={`${loyaltyTier} member • ${loyaltyPoints} points`} />
+          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mt-5 mb-2" style={{ color: colors.textMuted }}>Rewards</Text>
+          <View className="bg-white rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <MenuRow icon={<Gift size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Refer & Earn" subtitle="Get ₹100 for every friend" onPress={onShare} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Award size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Loyalty Program" subtitle={`${loyaltyTier} member • ${loyaltyPoints} points`} colors={colors} />
           </View>
 
           {isMockMode && (
             <View className="mt-5 p-3 rounded-xl2 border border-dashed" style={{ borderColor: colors.warning }}>
               <View className="flex-row items-center">
                 <ShoppingBasket size={14} color={colors.warning} />
-                <Text className="text-warning text-xs font-semibold ml-1.5">Preview Mode</Text>
+                <Text className="text-warning text-xs font-semibold ml-1.5" style={{ color: colors.warning }}>Preview Mode</Text>
               </View>
-              <Text className="text-muted text-xs mt-1">
+              <Text className="text-muted text-xs mt-1" style={{ color: colors.textMuted }}>
                 Firebase & Supabase are in mock mode. Sign out and back in to test the flow.
               </Text>
             </View>
@@ -251,10 +264,10 @@ export default function ProfileScreen() {
           <Pressable
             onPress={onLogout}
             className="mt-5 mb-8 bg-white rounded-xl2 border border-line py-3.5 flex-row items-center justify-center active:opacity-80"
-            style={{ borderColor: colors.errorLight }}
+            style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.errorLight }}
           >
             <LogOut size={16} color={colors.error} />
-            <Text className="text-error font-semibold text-sm ml-2">Sign Out</Text>
+            <Text className="text-error font-semibold text-sm ml-2" style={{ color: colors.error }}>Sign Out</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -262,24 +275,25 @@ export default function ProfileScreen() {
   );
 }
 
-function StatCell({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function StatCell({ icon, label, value, colors }: { icon: React.ReactNode; label: string; value: string; colors: any }) {
   return (
     <View className="flex-1 py-3 items-center">
       <View className="flex-row items-center mb-1">{icon}</View>
-      <Text className="text-textmain font-bold text-sm">{value}</Text>
-      <Text className="text-muted text-[10px]">{label}</Text>
+      <Text className="text-textmain font-bold text-sm" style={{ color: colors.text }}>{value}</Text>
+      <Text className="text-muted text-[10px]" style={{ color: colors.textMuted }}>{label}</Text>
     </View>
   );
 }
 
 function MenuRow({
-  icon, iconBg, title, subtitle, onPress
+  icon, iconBg, title, subtitle, onPress, colors
 }: {
   icon: React.ReactNode;
   iconBg: string;
   title: string;
   subtitle?: string;
   onPress?: () => void;
+  colors: any;
 }) {
   return (
     <Pressable
@@ -290,14 +304,14 @@ function MenuRow({
         {icon}
       </View>
       <View className="flex-1 ml-3">
-        <Text className="text-textmain text-sm font-medium">{title}</Text>
-        {subtitle && <Text className="text-muted text-[11px] mt-0.5">{subtitle}</Text>}
+        <Text className="text-textmain text-sm font-medium" style={{ color: colors.text }}>{title}</Text>
+        {subtitle && <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>{subtitle}</Text>}
       </View>
       <ChevronRight size={16} color={colors.textSubtle} />
     </Pressable>
   );
 }
 
-function Divider() {
+function Divider({ colors }: { colors: any }) {
   return <View style={{ height: 1, backgroundColor: colors.border, marginLeft: 60 }} />;
 }

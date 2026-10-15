@@ -1,10 +1,13 @@
 /**
  * OffersStrip — horizontal scrolling row of small offer cards (Zomato-style).
  * Each card: icon + offer title + small description.
+ *
+ * Card backgrounds are colourful pastel tints — kept identical in both modes
+ * per design spec. Only the section header text adapts.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 export interface OfferItem {
   id: string;
@@ -30,10 +33,11 @@ interface Props {
 }
 
 export function OffersStrip({ offers = DEFAULT_OFFERS, onPress }: Props) {
+  const colors = useThemeColors();
   return (
     <View style={styles.wrap}>
       <View style={styles.header}>
-        <Text style={styles.title}>🎁 Offers for you</Text>
+        <Text style={[styles.title, { color: colors.text }]}>🎁 Offers for you</Text>
       </View>
       <ScrollView
         horizontal
@@ -61,7 +65,7 @@ export function OffersStrip({ offers = DEFAULT_OFFERS, onPress }: Props) {
 const styles = StyleSheet.create({
   wrap: { marginTop: 22 },
   header: { paddingHorizontal: 16, marginBottom: 10 },
-  title: { fontSize: 16, fontWeight: '700', color: colors.text },
+  title: { fontSize: 16, fontWeight: '700' },
   scroll: { paddingHorizontal: 16, paddingBottom: 8 },
   card: {
     width: 130,

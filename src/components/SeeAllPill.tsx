@@ -1,12 +1,16 @@
 /**
  * SeeAllPill — Blinkit-style "See all products ▸" pill with overlapping
  * circular thumbnails on the left. Tap navigates to the full product list.
+ *
+ * Dark-mode aware — default emerald tint auto-brightens in dark mode and the
+ * matching shadow colour follows. White text is kept on the emerald surface
+ * (works in both modes per design spec).
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { ChevronRight } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 interface Props {
   label?: string;
@@ -15,7 +19,7 @@ interface Props {
   /** Emoji fallbacks used when image URLs are missing. */
   emojiFallbacks?: string[];
   onPress?: () => void;
-  /** Tint of the pill — defaults to emerald. */
+  /** Tint of the pill — defaults to emerald (adapts to dark mode). */
   tint?: string;
   /** Foreground (text) colour — defaults to white. */
   fg?: string;
@@ -26,16 +30,22 @@ export function SeeAllPill({
   thumbnails = [],
   emojiFallbacks = ['🛒', '🛍️', '🍿', '🥨'],
   onPress,
-  tint = colors.primary,
+  tint,
   fg = '#fff'
 }: Props) {
+  const colors = useThemeColors();
+  const tintClr = tint ?? colors.primary;
   const visibleThumbs = thumbnails.slice(0, 4);
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
         styles.wrap,
-        { backgroundColor: tint, opacity: pressed ? 0.92 : 1 }
+        {
+          backgroundColor: tintClr,
+          shadowColor: tintClr,
+          opacity: pressed ? 0.92 : 1
+        }
       ]}
     >
       {/* Overlapping circular thumbnails */}
@@ -78,7 +88,6 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     paddingRight: 16,
     borderRadius: 999,
-    shadowColor: '#12B76A',
     shadowOpacity: 0.18,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },

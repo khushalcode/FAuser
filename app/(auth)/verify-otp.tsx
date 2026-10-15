@@ -6,13 +6,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, Link } from 'expo-router';
 import { ChevronLeft, ShieldCheck, RefreshCw, MessageCircle, Lock } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useAuthStore } from '@/store/auth';
 import { hapticNotify } from '@/utils/platform';
 
 export default function VerifyOtpScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ phone: string; mockOtp?: string }>();
+  const colors = useThemeColors();
   const verifyOtp = useAuthStore((s) => s.verifyOtp);
   const isLoading = useAuthStore((s) => s.isLoading);
   const error = useAuthStore((s) => s.error);
@@ -174,7 +175,7 @@ export default function VerifyOtpScreen() {
                   borderRadius: 12,
                   borderWidth: 1.5,
                   borderColor: digit ? colors.primary : colors.border,
-                  backgroundColor: digit ? colors.primary50 : colors.surface,
+                  backgroundColor: digit ? colors.primary50 : colors.surfaceElevated,
                   textAlign: 'center',
                   fontSize: 20,
                   fontWeight: '700',
@@ -237,7 +238,7 @@ export default function VerifyOtpScreen() {
 
           {/* Resend timer */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
-            <Text className="text-muted text-sm">Didn't receive the code? </Text>
+            <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>Didn't receive the code? </Text>
             <Pressable
               onPress={onResend}
               disabled={seconds > 0}
@@ -260,7 +261,7 @@ export default function VerifyOtpScreen() {
           {/* Help */}
           <View style={{ marginTop: 24, padding: 16, borderRadius: 16, backgroundColor: colors.surface, alignItems: 'center' }}>
             <Lock size={14} color={colors.textMuted} />
-            <Text className="text-muted text-xs mt-1 text-center">
+            <Text className="text-muted text-xs mt-1 text-center" style={{ color: colors.textMuted }}>
               Having trouble?{' '}
               <Link href="/chat">
                 <Text style={{ color: colors.primary, fontWeight: '600' }}>Chat with support</Text>
@@ -269,9 +270,9 @@ export default function VerifyOtpScreen() {
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 16, marginBottom: 16 }}>
-            <Text className="text-muted text-sm">Want to use email instead? </Text>
+            <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>Want to use email instead? </Text>
             <Link href="/login">
-              <Text className="text-primary text-sm font-semibold">Sign in</Text>
+              <Text className="text-primary text-sm font-semibold" style={{ color: colors.primary }}>Sign in</Text>
             </Link>
           </View>
 

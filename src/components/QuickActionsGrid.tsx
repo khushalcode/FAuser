@@ -1,10 +1,14 @@
 /**
  * QuickActionsGrid — 4-tile quick action grid (Reorder, Wallet, Offers, Support).
+ *
+ * Dark-mode aware — text label adapts. Action tile background/foreground are
+ * pastel accent tints (kept as theme-aware *Light tokens) with matching
+ * saturated accent foregrounds.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { RefreshCw, Wallet, Tag, MessageCircle } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 interface Action {
   id: string;
@@ -15,18 +19,19 @@ interface Action {
   icon?: React.ReactNode;
 }
 
-const ACTIONS: Action[] = [
-  { id: 'reorder', label: 'Reorder', emoji: '🔄', bg: colors.primaryLight, fg: colors.primary },
-  { id: 'wallet', label: 'Wallet', emoji: '💰', bg: colors.warningLight, fg: colors.warning },
-  { id: 'offers', label: 'Offers', emoji: '🎁', bg: '#FCE7F3', fg: '#BE185D' },
-  { id: 'help', label: 'Help', emoji: '💬', bg: colors.infoLight, fg: colors.info },
-];
-
 interface Props {
   onPress?: (action: Action) => void;
 }
 
 export function QuickActionsGrid({ onPress }: Props) {
+  const colors = useThemeColors();
+  const ACTIONS: Action[] = [
+    { id: 'reorder', label: 'Reorder', emoji: '🔄', bg: colors.primaryLight, fg: colors.primary },
+    { id: 'wallet', label: 'Wallet', emoji: '💰', bg: colors.warningLight, fg: colors.warning },
+    { id: 'offers', label: 'Offers', emoji: '🎁', bg: colors.pinkLight, fg: colors.pink },
+    { id: 'help', label: 'Help', emoji: '💬', bg: colors.infoLight, fg: colors.info },
+  ];
+
   return (
     <View style={styles.wrap}>
       {ACTIONS.map((a) => (
@@ -38,7 +43,7 @@ export function QuickActionsGrid({ onPress }: Props) {
           <View style={[styles.iconWrap, { backgroundColor: a.bg }]}>
             <Text style={styles.emoji}>{a.emoji}</Text>
           </View>
-          <Text style={styles.label}>{a.label}</Text>
+          <Text style={[styles.label, { color: colors.text }]}>{a.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -73,7 +78,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    color: colors.text,
   },
 });
 

@@ -9,7 +9,7 @@ import {
   ArrowLeft, Phone, MessageSquare, Star, Clock, CheckCircle2,
   Circle, X, RotateCcw, Navigation as NavIcon, MapPin, Store as StoreIcon, Bike
 } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import {
   subscribeToOrder,
@@ -64,6 +64,7 @@ const TIMELINE: { status: OrderStatus; label: string; emoji: string }[] = [
 export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const colors = useThemeColors();
   const [order, setOrder] = React.useState<Order | null>(null);
   const [store, setStore] = React.useState<Store | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -170,7 +171,6 @@ export default function OrderDetailScreen() {
       if (unsubFcm) unsubFcm();
       if (unsubDm) unsubDm();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (loading) {
@@ -178,7 +178,7 @@ export default function OrderDetailScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={colors.primary} size="large" />
-          <Text className="text-muted text-sm mt-3">Loading order…</Text>
+          <Text className="text-muted text-sm mt-3" style={{ color: colors.textMuted }}>Loading order…</Text>
         </View>
       </SafeAreaView>
     );
@@ -189,7 +189,7 @@ export default function OrderDetailScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
         <View className="flex-1 items-center justify-center px-6">
           <Text className="text-5xl mb-3">😕</Text>
-          <Text className="text-textmain font-bold text-base">Order not found</Text>
+          <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>Order not found</Text>
           <Pressable
             onPress={() => router.replace('/(tabs)/orders')}
             className="mt-4 rounded-xl2 px-6 py-3"
@@ -264,12 +264,12 @@ export default function OrderDetailScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <View className="px-5 pt-2 pb-3 flex-row items-center justify-between">
         <View className="flex-row items-center">
-          <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3">
+          <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3" style={{ backgroundColor: colors.surface, borderColor: colors.borderLight }}>
             <ArrowLeft size={18} color={colors.text} />
           </Pressable>
           <View>
-            <Text className="text-textmain text-lg font-bold">Order {order.order_code}</Text>
-            <Text className="text-muted text-[11px]">{formatDate(order.created_at, true)}</Text>
+            <Text className="text-textmain text-lg font-bold" style={{ color: colors.text }}>Order {order.order_code}</Text>
+            <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>{formatDate(order.created_at, true)}</Text>
           </View>
         </View>
         <View className="flex-row items-center">
@@ -293,7 +293,7 @@ export default function OrderDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Live map */}
         {showMap && (
-          <View className="mx-5 mt-2 rounded-xl2 overflow-hidden border border-line" style={{ height: 220 }}>
+          <View className="mx-5 mt-2 rounded-xl2 overflow-hidden border border-line" style={{ borderColor: colors.border, height: 220 }}>
             <LiveMap
               storeLat={storeLat}
               storeLng={storeLng}
@@ -308,14 +308,14 @@ export default function OrderDetailScreen() {
         )}
 
         {/* Status timeline */}
-        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4">
+        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
           {isCancelled ? (
             <View className="items-center py-3">
               <View className="w-12 h-12 rounded-full items-center justify-center" style={{ backgroundColor: colors.errorLight }}>
                 <X size={22} color={colors.error} />
               </View>
-              <Text className="text-textmain font-bold text-base mt-2">Order Cancelled</Text>
-              <Text className="text-muted text-xs mt-0.5">Your refund will be processed in 5-7 business days.</Text>
+              <Text className="text-textmain font-bold text-base mt-2" style={{ color: colors.text }}>Order Cancelled</Text>
+              <Text className="text-muted text-xs mt-0.5" style={{ color: colors.textMuted }}>Your refund will be processed in 5-7 business days.</Text>
             </View>
           ) : (
             <>
@@ -362,7 +362,7 @@ export default function OrderDetailScreen() {
                             <Circle size={10} color="#fff" fill="#fff" />
                           </View>
                         ) : (
-                          <View className="w-6 h-6 rounded-full items-center justify-center border-2" style={{ borderColor: colors.border, backgroundColor: '#fff' }}>
+                          <View className="w-6 h-6 rounded-full items-center justify-center border-2" style={{ borderColor: colors.border, backgroundColor: colors.surfaceElevated }}>
                             <Circle size={6} color={colors.border} />
                           </View>
                         )}
@@ -378,13 +378,13 @@ export default function OrderDetailScreen() {
                           {step.emoji} {step.label}
                         </Text>
                         {isCurrent && (
-                          <Text className="text-muted text-[11px] mt-0.5">In progress…</Text>
+                          <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>In progress…</Text>
                         )}
                         {isDone && step.status === 'pending' && (
-                          <Text className="text-muted text-[11px] mt-0.5">{formatTime(order.created_at)}</Text>
+                          <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>{formatTime(order.created_at)}</Text>
                         )}
                         {isDone && step.status === 'delivered' && order.delivered_at && (
-                          <Text className="text-muted text-[11px] mt-0.5">{formatTime(order.delivered_at)}</Text>
+                          <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>{formatTime(order.delivered_at)}</Text>
                         )}
                       </View>
                     </View>
@@ -397,17 +397,17 @@ export default function OrderDetailScreen() {
 
         {/* Delivery man */}
         {!isCancelled && order.delivery_man_name && (
-          <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4 flex-row items-center">
+          <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4 flex-row items-center" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
             <View className="w-12 h-12 rounded-full items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
-              <Text className="text-primary font-bold text-base">
+              <Text className="text-primary font-bold text-base" style={{ color: colors.primary }}>
                 {order.delivery_man_name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
               </Text>
             </View>
             <View className="flex-1 ml-3">
-              <Text className="text-textmain font-semibold text-sm">{order.delivery_man_name}</Text>
+              <Text className="text-textmain font-semibold text-sm" style={{ color: colors.text }}>{order.delivery_man_name}</Text>
               <View className="flex-row items-center">
                 <Star size={11} color={colors.warning} fill={colors.warning} />
-                <Text className="text-muted text-[11px] ml-0.5">4.8 • Your delivery partner</Text>
+                <Text className="text-muted text-[11px] ml-0.5" style={{ color: colors.textMuted }}>4.8 • Your delivery partner</Text>
               </View>
             </View>
             <Pressable
@@ -430,17 +430,17 @@ export default function OrderDetailScreen() {
         )}
 
         {/* Items */}
-        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4">
+        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="text-textmain font-bold text-sm">Order Items</Text>
+            <Text className="text-textmain font-bold text-sm" style={{ color: colors.text }}>Order Items</Text>
             <Pressable onPress={onReorder} className="flex-row items-center px-2.5 py-1 rounded-md" style={{ backgroundColor: colors.primaryLight }}>
               <RotateCcw size={11} color={colors.primary} />
-              <Text className="text-primary text-[11px] font-semibold ml-1">Reorder</Text>
+              <Text className="text-primary text-[11px] font-semibold ml-1" style={{ color: colors.primary }}>Reorder</Text>
             </Pressable>
           </View>
 
           {order.items.map((it, idx) => (
-            <View key={it.product_id + idx} className="flex-row items-center py-2 border-b border-lineLight">
+            <View key={it.product_id + idx} className="flex-row items-center py-2 border-b border-lineLight" style={{ borderBottomColor: colors.borderLight }}>
               <View
                 className="w-12 h-12 rounded-xl items-center justify-center"
                 style={{ backgroundColor: colors.primaryLight }}
@@ -448,43 +448,43 @@ export default function OrderDetailScreen() {
                 <Text className="text-xl">🛍️</Text>
               </View>
               <View className="flex-1 ml-3">
-                <Text className="text-textmain text-sm font-medium" numberOfLines={1}>{it.name}</Text>
-                <Text className="text-muted text-[11px] mt-0.5">{it.quantity} × {formatCurrency(it.price)} • {it.unit}</Text>
+                <Text className="text-textmain text-sm font-medium" style={{ color: colors.text }} numberOfLines={1}>{it.name}</Text>
+                <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>{it.quantity} × {formatCurrency(it.price)} • {it.unit}</Text>
               </View>
-              <Text className="text-textmain text-sm font-semibold">{formatCurrency(it.price * it.quantity)}</Text>
+              <Text className="text-textmain text-sm font-semibold" style={{ color: colors.text }}>{formatCurrency(it.price * it.quantity)}</Text>
             </View>
           ))}
         </View>
 
         {/* Bill */}
-        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4">
-          <Text className="text-textmain font-bold text-sm mb-3">Bill Details</Text>
-          <BillRow label="Item total" value={formatCurrency(order.subtotal)} />
-          <BillRow label="Delivery fee" value={order.delivery_fee === 0 ? 'FREE' : formatCurrency(order.delivery_fee)} valueColor={order.delivery_fee === 0 ? colors.success : colors.text} />
-          {order.discount > 0 && <BillRow label="Discount" value={`− ${formatCurrency(order.discount)}`} valueColor={colors.success} />}
-          <BillRow label="Taxes" value={formatCurrency(order.tax)} />
-          <View className="h-px bg-line my-2.5" />
+        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+          <Text className="text-textmain font-bold text-sm mb-3" style={{ color: colors.text }}>Bill Details</Text>
+          <BillRow label="Item total" value={formatCurrency(order.subtotal)} colors={colors} />
+          <BillRow label="Delivery fee" value={order.delivery_fee === 0 ? 'FREE' : formatCurrency(order.delivery_fee)} valueColor={order.delivery_fee === 0 ? colors.success : colors.text} colors={colors} />
+          {order.discount > 0 && <BillRow label="Discount" value={`− ${formatCurrency(order.discount)}`} valueColor={colors.success} colors={colors} />}
+          <BillRow label="Taxes" value={formatCurrency(order.tax)} colors={colors} />
+          <View className="h-px bg-line my-2.5" style={{ backgroundColor: colors.borderLight }} />
           <View className="flex-row justify-between">
-            <Text className="text-textmain font-bold text-base">Paid ({order.payment_method})</Text>
-            <Text className="text-textmain font-bold text-base">{formatCurrency(order.total)}</Text>
+            <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>Paid ({order.payment_method})</Text>
+            <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>{formatCurrency(order.total)}</Text>
           </View>
         </View>
 
         {/* Delivery address */}
-        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4">
-          <Text className="text-textmain font-bold text-sm mb-2">Delivery Address</Text>
-          <Text className="text-textmain text-sm" numberOfLines={2}>{order.delivery_address}</Text>
+        <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+          <Text className="text-textmain font-bold text-sm mb-2" style={{ color: colors.text }}>Delivery Address</Text>
+          <Text className="text-textmain text-sm" style={{ color: colors.text }} numberOfLines={2}>{order.delivery_address}</Text>
           {order.note && (
             <View className="mt-2 p-2 rounded-md" style={{ backgroundColor: colors.surface }}>
-              <Text className="text-muted text-xs">Note: {order.note}</Text>
+              <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Note: {order.note}</Text>
             </View>
           )}
         </View>
 
         {/* Rate */}
         {isDelivered && (
-          <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4">
-            <Text className="text-textmain font-bold text-sm mb-2">
+          <View className="mx-5 mt-4 bg-white rounded-xl2 border border-line p-4" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <Text className="text-textmain font-bold text-sm mb-2" style={{ color: colors.text }}>
               {order.rating ? 'Your Rating' : 'Rate this order'}
             </Text>
             <View className="flex-row">
@@ -511,9 +511,9 @@ export default function OrderDetailScreen() {
           <Pressable
             onPress={onCancel}
             className="mx-5 mt-4 mb-8 rounded-xl2 py-3 items-center border"
-            style={{ borderColor: colors.error, backgroundColor: '#fff' }}
+            style={{ borderColor: colors.error, backgroundColor: colors.surfaceElevated }}
           >
-            <Text className="text-error font-semibold text-sm">Cancel Order</Text>
+            <Text className="text-error font-semibold text-sm" style={{ color: colors.error }}>Cancel Order</Text>
           </Pressable>
         )}
       </ScrollView>
@@ -534,6 +534,7 @@ function LiveMap({
   dmLng?: number;
   onTheWay?: boolean;
 }) {
+  const colors = useThemeColors();
   const [polyline, setPolyline] = React.useState<{ latitude: number; longitude: number }[]>([]);
 
   // Compute initial region that fits all known markers.
@@ -588,7 +589,7 @@ function LiveMap({
     return (
       <View style={{ flex: 1, backgroundColor: colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' }}>
         <MapPin size={36} color={colors.primary} />
-        <Text className="text-muted text-xs mt-2">Live map available in APK build</Text>
+        <Text className="text-muted text-xs mt-2" style={{ color: colors.textMuted }}>Live map available in APK build</Text>
       </View>
     );
   }
@@ -604,7 +605,7 @@ function LiveMap({
     >
       {storeLat && storeLng && (
         <Marker coordinate={{ latitude: storeLat, longitude: storeLng }} title={storeName || 'Store'}>
-          <View style={mapStyles.marker}>
+          <View style={[mapStyles.marker, { backgroundColor: colors.warning }]}>
             <StoreIcon size={14} color="#fff" />
           </View>
         </Marker>
@@ -662,11 +663,11 @@ function decodePolyline(str: string): { latitude: number; longitude: number }[] 
   return coordinates;
 }
 
-function BillRow({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
+function BillRow({ label, value, valueColor, colors }: { label: string; value: string; valueColor?: string; colors: any }) {
   return (
     <View className="flex-row justify-between mb-1.5">
-      <Text className="text-muted text-sm">{label}</Text>
-      <Text className="text-textmain text-sm font-medium" style={{ color: valueColor }}>{value}</Text>
+      <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>{label}</Text>
+      <Text className="text-textmain text-sm font-medium" style={{ color: valueColor || colors.text }}>{value}</Text>
     </View>
   );
 }
@@ -676,7 +677,6 @@ const mapStyles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.warning,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,

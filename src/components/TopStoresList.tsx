@@ -1,12 +1,14 @@
 /**
  * TopStoresList — vertical list of top-rated restaurants (Zomato-style list cards).
  * Each card: cover image + name + cuisine + rating + delivery time + offers + distance.
+ *
+ * Dark-mode aware — card surface, borders, text + meta colours all adapt.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, FlatList, Image } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { Star, Clock, MapPin, Bike, BadgePercent, Zap } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import type { Store } from '@/lib/types';
 import { formatCurrency } from '@/utils/format';
 import { getStoreImage } from '@/utils/images';
@@ -17,15 +19,18 @@ interface Props {
 }
 
 export function TopStoresList({ stores, onPress }: Props) {
+  const colors = useThemeColors();
   return (
     <View style={styles.wrap}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>🍽️ Top Restaurants Near You</Text>
-          <Text style={styles.subtitle}>Curated picks from your area</Text>
+          <Text style={[styles.title, { color: colors.text }]}>🍽️ Top Restaurants Near You</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+            Curated picks from your area
+          </Text>
         </View>
         <Pressable>
-          <Text style={styles.seeAll}>See all →</Text>
+          <Text style={[styles.seeAll, { color: colors.primary }]}>See all →</Text>
         </Pressable>
       </View>
       <View style={styles.listWrap}>
@@ -38,6 +43,7 @@ export function TopStoresList({ stores, onPress }: Props) {
 }
 
 function StoreListCard({ store, onPress }: { store: Store; onPress: () => void }) {
+  const colors = useThemeColors();
   const freeDelivery = store.delivery_fee === 0;
   const deliveryLabel = freeDelivery ? 'FREE' : formatCurrency(store.delivery_fee);
   // Deterministic distance based on store id
@@ -46,18 +52,19 @@ function StoreListCard({ store, onPress }: { store: Store; onPress: () => void }
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && { opacity: 0.9 }]}
+      style={({ pressed }) => [
+        styles.card,
+        {
+          backgroundColor: colors.surfaceElevated,
+          borderColor: colors.borderLight,
+        },
+        pressed && { opacity: 0.9 },
+      ]}
     >
       <View style={styles.imageWrap}>
-        {getStoreImage(store.id) ? (
-          <ExpoImage source={getStoreImage(store.id)} style={styles.image} contentFit="cover" />
-        ) : (
-          <View style={[styles.image, { backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' }]}>
-            <Text style={{ fontSize: 32 }}>🍽️</Text>
-          </View>
-        )}
+        <ExpoImage source={getStoreImage(store.id)} style={styles.image} contentFit="cover" />
         {/* Rating chip */}
-        <View style={styles.ratingChip}>
+        <View style={[styles.ratingChip, { backgroundColor: colors.primary }]}>
           <Star size={10} color="#fff" fill="#fff" />
           <Text style={styles.ratingText}>{store.rating.toFixed(1)}</Text>
         </View>
@@ -65,41 +72,69 @@ function StoreListCard({ store, onPress }: { store: Store; onPress: () => void }
         {freeDelivery && (
           <View style={styles.freeDelRibbon}>
             <Zap size={9} color={colors.primary} fill={colors.primary} />
-            <Text style={styles.freeDelText}>FREE DEL</Text>
+            <Text style={[styles.freeDelText, { color: colors.primary }]}>FREE DEL</Text>
           </View>
         )}
       </View>
 
       <View style={styles.body}>
         <View style={styles.titleRow}>
-          <Text style={styles.name} numberOfLines={1}>{store.name}</Text>
-          <View style={[styles.typeBadge, store.store_type === 'Grocery' ? { backgroundColor: colors.primaryLight } : { backgroundColor: colors.warningLight }]}>
-            <Text style={[styles.typeText, store.store_type === 'Grocery' ? { color: colors.primary } : { color: colors.warning }]}>
+          <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{store.name}</Text>
+          <View
+            style={[
+              styles.typeBadge,
+              store.store_type === 'Grocery'
+                ? { backgroundColor: colors.primaryLight }
+                : { backgroundColor: colors.warningLight },
+            ]}
+          >
+            <Text
+              style={[
+                styles.typeText,
+                store.store_type === 'Grocery'
+                  ? { color: colors.primary }
+                  : { color: colors.warning },
+              ]}
+            >
               {store.store_type?.toUpperCase()}
             </Text>
           </View>
         </View>
-        <Text style={styles.cuisine} numberOfLines={1}>{store.description}</Text>
+        <Text style={[styles.cuisine, { color: colors.textMuted }]} numberOfLines={1}>
+          {store.description}
+        </Text>
 
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
             <Clock size={11} color={colors.textMuted} />
-            <Text style={styles.metaText}>{store.delivery_time_minutes} min</Text>
+            <Text style={[styles.metaText, { color: colors.textMuted }]}>
+              {store.delivery_time_minutes} min
+            </Text>
           </View>
           <View style={styles.metaItem}>
             <Bike size={11} color={freeDelivery ? colors.primary : colors.textMuted} />
-            <Text style={[styles.metaText, freeDelivery && { color: colors.primary, fontWeight: '600' }]}>{deliveryLabel}</Text>
+            <Text
+              style={[
+                styles.metaText,
+                { color: colors.textMuted },
+                freeDelivery && { color: colors.primary, fontWeight: '600' },
+              ]}
+            >
+              {deliveryLabel}
+            </Text>
           </View>
           <View style={styles.metaItem}>
             <MapPin size={11} color={colors.textMuted} />
-            <Text style={styles.metaText}>{distance}</Text>
+            <Text style={[styles.metaText, { color: colors.textMuted }]}>{distance}</Text>
           </View>
         </View>
 
         <View style={styles.offerRow}>
-          <View style={styles.offerBadge}>
+          <View style={[styles.offerBadge, { backgroundColor: colors.warningLight }]}>
             <BadgePercent size={10} color={colors.warning} />
-            <Text style={styles.offerText}>50% OFF up to ₹100</Text>
+            <Text style={[styles.offerText, { color: colors.warning }]}>
+              50% OFF up to ₹100
+            </Text>
           </View>
           <View style={[styles.offerBadge, { backgroundColor: colors.primaryLight }]}>
             <Text style={[styles.offerText, { color: colors.primary }]}>WELCOME50</Text>
@@ -119,17 +154,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 10,
   },
-  title: { fontSize: 16, fontWeight: '700', color: colors.text },
-  subtitle: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
-  seeAll: { fontSize: 12, fontWeight: '600', color: colors.primary },
+  title: { fontSize: 16, fontWeight: '700' },
+  subtitle: { fontSize: 12, marginTop: 2 },
+  seeAll: { fontSize: 12, fontWeight: '600' },
   listWrap: { paddingHorizontal: 16 },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     marginBottom: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: colors.borderLight,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -144,7 +177,6 @@ const styles = StyleSheet.create({
     right: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -162,7 +194,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   freeDelText: {
-    color: colors.primary,
     fontSize: 9,
     fontWeight: '800',
     marginLeft: 3,
@@ -177,7 +208,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.text,
     flex: 1,
     marginRight: 8,
   },
@@ -193,7 +223,6 @@ const styles = StyleSheet.create({
   },
   cuisine: {
     fontSize: 11,
-    color: colors.textMuted,
     marginBottom: 8,
   },
   metaRow: {
@@ -208,7 +237,6 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 11,
-    color: colors.textMuted,
     marginLeft: 4,
   },
   offerRow: {
@@ -219,7 +247,6 @@ const styles = StyleSheet.create({
   offerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.warningLight,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -229,7 +256,6 @@ const styles = StyleSheet.create({
   offerText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.warning,
     marginLeft: 3,
   },
 });

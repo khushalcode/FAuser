@@ -7,12 +7,15 @@
  * The active tab is highlighted with a bold label + an animated underline
  * that re-renders on the newly active tab. Tapping a tab fires onChange —
  * the parent controls the colour blend and content crossfade.
+ *
+ * Dark-mode aware — surface + inactive text colour adapt. Active colour
+ * defaults to the theme primary (auto-brightens in dark mode).
  */
 import React from 'react';
 import {
   View, Text, Pressable, StyleSheet, ScrollView
 } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 export interface TabItem {
   key: string;
@@ -23,15 +26,16 @@ interface Props {
   tabs: TabItem[];
   active: string;
   onChange: (key: string) => void;
-  /** Active tab text colour — defaults to primary. */
+  /** Active tab text colour — defaults to theme primary. */
   activeColor?: string;
 }
 
 export function TabRow({ tabs, active, onChange, activeColor }: Props) {
+  const colors = useThemeColors();
   const color = activeColor || colors.primary;
 
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, { backgroundColor: colors.background }]}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -74,9 +78,7 @@ export function TabRow({ tabs, active, onChange, activeColor }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    backgroundColor: '#fff'
-  },
+  wrap: {},
   content: {
     paddingHorizontal: 8,
     alignItems: 'center',

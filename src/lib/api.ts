@@ -703,7 +703,7 @@ export const api = {
       return (ensure<any>(data)).map((a) => ({
         id: a.id,
         customer_id: a.customer_id,
-        label: (a.label in ['Home', 'Work', 'Other']) ? a.label : 'Other',
+        label: (['Home', 'Work', 'Other'] as const).includes(a.label) ? a.label : 'Other',
         full_name: a.full_name || '',
         phone: a.phone || '',
         line1: a.full_address || '',

@@ -5,7 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Bell, Tag, Package, MessageSquare, Settings, CheckCheck, Wifi } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import { subscribeToNotifications, isSupabaseConfigured } from '@/lib/realtime';
 import { useAuthStore } from '@/store/auth';
@@ -17,6 +17,7 @@ import { hapticNotify } from '@/utils/platform';
 export default function NotificationsScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const colors = useThemeColors();
   const [items, setItems] = React.useState<AppNotification[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -88,11 +89,11 @@ export default function NotificationsScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <View className="px-5 pt-2 pb-3 flex-row items-center justify-between">
         <View className="flex-row items-center">
-          <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3">
+          <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3" style={{ backgroundColor: colors.surface, borderColor: colors.borderLight }}>
             <ArrowLeft size={18} color={colors.text} />
           </Pressable>
           <View>
-            <Text className="text-textmain text-[22px] font-extrabold tracking-tight">Notifications</Text>
+            <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>Notifications</Text>
             {isSupabaseConfigured && (
               <View className="flex-row items-center mt-0.5">
                 <Wifi size={9} color={live ? colors.success : colors.textSubtle} />
@@ -112,7 +113,7 @@ export default function NotificationsScreen() {
           style={{ backgroundColor: colors.primaryLight }}
         >
           <CheckCheck size={12} color={colors.primary} />
-          <Text className="text-primary text-xs font-semibold ml-1">Mark all read</Text>
+          <Text className="text-primary text-xs font-semibold ml-1" style={{ color: colors.primary }}>Mark all read</Text>
         </Pressable>
       </View>
 
@@ -125,8 +126,8 @@ export default function NotificationsScreen() {
           <View className="w-20 h-20 rounded-full items-center justify-center" style={{ backgroundColor: colors.surfaceAlt }}>
             <Bell size={36} color={colors.textMuted} />
           </View>
-          <Text className="text-textmain font-bold text-sm mt-3">No notifications</Text>
-          <Text className="text-muted text-xs mt-1">You'll see order updates and offers here.</Text>
+          <Text className="text-textmain font-bold text-sm mt-3" style={{ color: colors.text }}>No notifications</Text>
+          <Text className="text-muted text-xs mt-1" style={{ color: colors.textMuted }}>You'll see order updates and offers here.</Text>
         </View>
       ) : (
         <FlatList
@@ -140,9 +141,9 @@ export default function NotificationsScreen() {
               onPress={() => onTap(item)}
               className="bg-white rounded-xl2 border p-3.5 flex-row active:opacity-80"
               style={{
+                backgroundColor: item.is_read ? colors.surfaceElevated : colors.primary50,
                 borderColor: item.is_read ? colors.border : colors.primary + '60',
                 borderWidth: item.is_read ? 1 : 1.5,
-                backgroundColor: item.is_read ? '#fff' : colors.primary50
               }}
             >
               <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: bgFor(item) }}>
@@ -150,10 +151,10 @@ export default function NotificationsScreen() {
               </View>
               <View className="flex-1 ml-3">
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-textmain font-semibold text-sm flex-1" numberOfLines={1}>{item.title}</Text>
-                  <Text className="text-muted text-[10px] ml-2">{timeAgo(item.created_at)}</Text>
+                  <Text className="text-textmain font-semibold text-sm flex-1" style={{ color: colors.text }} numberOfLines={1}>{item.title}</Text>
+                  <Text className="text-muted text-[10px] ml-2" style={{ color: colors.textMuted }}>{timeAgo(item.created_at)}</Text>
                 </View>
-                <Text className="text-muted text-xs mt-0.5" numberOfLines={3}>{item.body}</Text>
+                <Text className="text-muted text-xs mt-0.5" style={{ color: colors.textMuted }} numberOfLines={3}>{item.body}</Text>
               </View>
               {!item.is_read && (
                 <View className="w-2 h-2 rounded-full ml-2 mt-2" style={{ backgroundColor: colors.primary }} />

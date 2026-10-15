@@ -8,17 +8,20 @@ import { Platform } from 'react-native';
  *   - <SkeletonShimmer /> — single block (width/height/radius configurable)
  *   - <SkeletonGrid /> — a 2-column grid of product-card skeletons used by
  *     the home screen while sections are loading.
+ *
+ * Dark-mode aware — the block tint + sweep highlight + card surfaces all
+ * adapt via the theme.
  */
 import React from 'react';
 import { View, Animated, Easing, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 interface SkeletonProps {
   width?: number | string;
   height?: number | string;
   radius?: number;
   style?: StyleProp<ViewStyle>;
-  /** Tint of the skeleton block. Defaults to a neutral grey. */
+  /** Tint of the skeleton block. Defaults to theme shimmerBase. */
   color?: string;
 }
 
@@ -29,6 +32,7 @@ export function SkeletonShimmer({
   style,
   color
 }: SkeletonProps) {
+  const colors = useThemeColors();
   const translateX = React.useRef(new Animated.Value(-1)).current;
 
   React.useEffect(() => {
@@ -52,7 +56,7 @@ export function SkeletonShimmer({
           width: width as any,
           height: height as any,
           borderRadius: radius,
-          backgroundColor: color || colors.surfaceAlt
+          backgroundColor: color || colors.shimmerBase
         },
         style
       ]}
@@ -61,6 +65,7 @@ export function SkeletonShimmer({
         style={[
           styles.sweep,
           {
+            backgroundColor: colors.shimmerHighlight,
             transform: [
               {
                 translateX: translateX.interpolate({
@@ -78,10 +83,11 @@ export function SkeletonShimmer({
 
 /** 2-column grid of product-card skeletons — used between sections. */
 export function SkeletonGrid({ count = 4 }: { count?: number }) {
+  const colors = useThemeColors();
   return (
     <View style={styles.grid}>
       {Array.from({ length: count }).map((_, i) => (
-        <View key={i} style={styles.card}>
+        <View key={i} style={[styles.card, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
           <SkeletonShimmer width="100%" height={120} radius={12} />
           <SkeletonShimmer width="60%" height={10} style={{ marginTop: 8 }} />
           <SkeletonShimmer width="100%" height={10} style={{ marginTop: 6 }} />
@@ -98,10 +104,11 @@ export function SkeletonGrid({ count = 4 }: { count?: number }) {
 
 /** Horizontal carousel of card skeletons — used by section loaders. */
 export function SkeletonRow({ count = 4 }: { count?: number }) {
+  const colors = useThemeColors();
   return (
     <View style={styles.rowWrap}>
       {Array.from({ length: count }).map((_, i) => (
-        <View key={i} style={styles.rowCard}>
+        <View key={i} style={[styles.rowCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
           <SkeletonShimmer width={140} height={120} radius={12} />
           <SkeletonShimmer width={100} height={10} style={{ marginTop: 8 }} />
           <SkeletonShimmer width={70} height={10} style={{ marginTop: 6 }} />
@@ -114,10 +121,11 @@ export function SkeletonRow({ count = 4 }: { count?: number }) {
 
 /** Bestseller-tile skeleton — 3x2 grid of square tints. */
 export function SkeletonBestsellers() {
+  const colors = useThemeColors();
   return (
     <View style={styles.grid3}>
       {Array.from({ length: 6 }).map((_, i) => (
-        <View key={i} style={styles.bsTile}>
+        <View key={i} style={[styles.bsTile, { backgroundColor: colors.surfaceAlt }]}>
           <SkeletonShimmer width={48} height={48} radius={24} />
           <SkeletonShimmer width="70%" height={10} style={{ marginTop: 8 }} />
           <SkeletonShimmer width="50%" height={8} style={{ marginTop: 6 }} />
@@ -138,7 +146,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     width: 300,
-    backgroundColor: 'rgba(255,255,255,0.45)',
     transform: [{ skewX: '-20deg' }]
   },
   grid: {
@@ -150,12 +157,10 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '48%',
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 12,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: colors.border
+    borderWidth: 1
   },
   row: {
     flexDirection: 'row',
@@ -170,11 +175,9 @@ const styles = StyleSheet.create({
   },
   rowCard: {
     width: 140,
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 12,
-    borderWidth: 1,
-    borderColor: colors.border
+    borderWidth: 1
   },
   grid3: {
     flexDirection: 'row',
@@ -188,8 +191,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surfaceAlt
+    justifyContent: 'center'
   }
 });
 

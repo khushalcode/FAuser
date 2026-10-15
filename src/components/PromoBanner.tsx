@@ -11,7 +11,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import type { PromoBannerData } from '@/data/mock-data';
-import { colors } from '@/theme/colors';
 import { useRouter } from 'expo-router';
 
 interface Props {
@@ -19,6 +18,10 @@ interface Props {
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+/** Dark ink used for text on the always-white brand badge + CTA button.
+ *  Backgrounds don't change in dark mode, so the ink stays dark too. */
+const INK_ON_WHITE = '#101828';
 
 export function PromoBanner({ banner }: Props) {
   const router = useRouter();
@@ -107,7 +110,7 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 9,
     fontWeight: '800',
-    color: colors.text,
+    color: INK_ON_WHITE,
     letterSpacing: 0.4,
     textTransform: 'uppercase'
   },
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     fontSize: 11,
-    color: colors.text,
+    color: INK_ON_WHITE,
     fontWeight: '800',
     letterSpacing: 0.3
   },

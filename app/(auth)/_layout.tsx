@@ -3,13 +3,13 @@ import { Stack, useRouter, useRootNavigationState } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 export default function AuthLayout() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isMockMode = useAuthStore((s) => s.isMockMode);
   const loadProfile = useUserStore((s) => s.loadProfile);
+  const colors = useThemeColors();
   const [checking, setChecking] = React.useState(true);
 
   React.useEffect(() => {

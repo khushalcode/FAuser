@@ -15,7 +15,7 @@ import {
   View, Text, Pressable, StyleSheet, Dimensions, FlatList
 } from 'react-native';
 import type { Product, Store } from '@/lib/types';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { ProductCard } from './ProductCard';
 import { SeeAllPill } from './SeeAllPill';
 import { SkeletonShimmer } from './SkeletonShimmer';
@@ -51,6 +51,7 @@ export function ProductCarouselRow({
   isLoading = false
 }: Props) {
   const router = useRouter();
+  const colors = useThemeColors();
   const [activeChip, setActiveChip] = React.useState('All');
 
   // Filter products client-side based on the active chip's mapped tags.
@@ -67,14 +68,14 @@ export function ProductCarouselRow({
     <View style={styles.section}>
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
             {emoji ? `${emoji}  ` : ''}{title}
           </Text>
-          {subtitle ? <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text> : null}
+          {subtitle ? <Text style={[styles.subtitle, { color: colors.textMuted }]} numberOfLines={1}>{subtitle}</Text> : null}
         </View>
         {onSeeAll && (
           <Pressable onPress={onSeeAll} style={styles.seeAll}>
-            <Text style={styles.seeAllText}>See all</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>See all</Text>
             <ChevronRight size={13} color={colors.primary} strokeWidth={2.5} />
           </Pressable>
         )}
@@ -109,8 +110,8 @@ export function ProductCarouselRow({
             </View>
           }
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={styles.emptyText}>No products in this filter.</Text>
+            <View style={[styles.empty, { backgroundColor: colors.surfaceAlt }]}>
+              <Text style={[styles.emptyText, { color: colors.textMuted }]}>No products in this filter.</Text>
             </View>
           }
           renderItem={({ item }) => (
@@ -137,13 +138,15 @@ export function ProductCarouselRow({
                 onPress={() => setActiveChip(c)}
                 style={[
                   styles.chip,
-                  active && styles.chipActive,
+                  { backgroundColor: colors.surfaceAlt },
+                  active && { backgroundColor: colors.primary50 },
                   active && { borderColor: colors.primary }
                 ]}
               >
                 <Text
                   style={[
                     styles.chipText,
+                    { color: colors.textMuted },
                     active && { color: colors.primary, fontWeight: '700' }
                   ]}
                 >
@@ -172,13 +175,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '900',
-    color: colors.text,
     letterSpacing: -0.4,
     lineHeight: 22
   },
   subtitle: {
     fontSize: 12,
-    color: colors.textMuted,
     marginTop: 2
   },
   seeAll: {
@@ -187,7 +188,6 @@ const styles = StyleSheet.create({
     paddingBottom: 2
   },
   seeAllText: {
-    color: colors.primary,
     fontSize: 13,
     fontWeight: '700'
   },
@@ -202,13 +202,11 @@ const styles = StyleSheet.create({
     height: 220,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surfaceAlt,
     borderRadius: 14,
     marginHorizontal: 4
   },
   emptyText: {
     fontSize: 11,
-    color: colors.textMuted,
     textAlign: 'center',
     padding: 12
   },
@@ -223,16 +221,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: colors.surfaceAlt,
     borderWidth: 1.5,
     borderColor: 'transparent'
   },
-  chipActive: {
-    backgroundColor: colors.primary50
-  },
   chipText: {
     fontSize: 11,
-    color: colors.textMuted,
     fontWeight: '600'
   }
 });

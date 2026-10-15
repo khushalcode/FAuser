@@ -8,13 +8,14 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import {
   ArrowLeft, Star, Clock, Bike, MapPin, Search, Heart, Share2, ShoppingBag
 } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import type { Store, Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
 import { formatCurrency } from '@/utils/format';
+import type { ThemeColors } from '@/theme/colors';
 
-function storeVisual(store: Store): { accent: string; light: string; emoji: string } {
+function storeVisual(store: Store, colors: ThemeColors): { accent: string; light: string; emoji: string } {
   const t = (store.store_type || '').toLowerCase();
   if (t.includes('grocery') || t.includes('super') || t.includes('mart')) {
     return { accent: colors.primary, light: colors.primaryLight, emoji: '🏪' };
@@ -28,6 +29,7 @@ function storeVisual(store: Store): { accent: string; light: string; emoji: stri
 export default function StoreScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const colors = useThemeColors();
   const [store, setStore] = React.useState<Store | null>(null);
   const [products, setProducts] = React.useState<Product[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]);
@@ -63,7 +65,7 @@ export default function StoreScreen() {
     );
   }
 
-  const { accent, light, emoji } = storeVisual(store);
+  const { accent, light, emoji } = storeVisual(store, colors);
   const filtered = products.filter((p) => {
     if (activeCat !== 'all' && p.category_id !== activeCat) return false;
     if (query && !p.name.toLowerCase().includes(query.toLowerCase())) return false;
@@ -81,14 +83,14 @@ export default function StoreScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       {/* Header */}
       <View className="absolute top-0 left-0 right-0 z-10 flex-row items-center justify-between px-4 pt-2">
-        <Pressable onPress={() => router.back()} className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 4 }}>
+        <Pressable onPress={() => router.back()} className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ backgroundColor: colors.surfaceElevated, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 }}>
           <ArrowLeft size={18} color={colors.text} />
         </Pressable>
         <View className="flex-row">
-          <Pressable onPress={onShare} className="w-9 h-9 rounded-full items-center justify-center bg-white mr-2" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 4 }}>
+          <Pressable onPress={onShare} className="w-9 h-9 rounded-full items-center justify-center bg-white mr-2" style={{ backgroundColor: colors.surfaceElevated, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 }}>
             <Share2 size={16} color={colors.text} />
           </Pressable>
-          <Pressable className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ elevation: 2, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 4 }}>
+          <Pressable className="w-9 h-9 rounded-full items-center justify-center bg-white" style={{ backgroundColor: colors.surfaceElevated, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 }}>
             <Heart size={16} color={colors.error} />
           </Pressable>
         </View>
@@ -111,33 +113,33 @@ export default function StoreScreen() {
         </View>
 
         {/* Store info */}
-        <View className="bg-white px-5 py-4 border-b border-line">
-          <Text className="text-textmain text-[22px] font-extrabold tracking-tight">{store.name}</Text>
-          <Text className="text-muted text-sm mt-0.5">{store.description}</Text>
+        <View className="bg-white px-5 py-4 border-b border-line" style={{ backgroundColor: colors.surfaceElevated, borderBottomColor: colors.border }}>
+          <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>{store.name}</Text>
+          <Text className="text-muted text-sm mt-0.5" style={{ color: colors.textMuted }}>{store.description}</Text>
 
           <View className="flex-row items-center mt-3 flex-wrap">
             <View className="flex-row items-center px-2 py-1 rounded-md mr-2 mb-1" style={{ backgroundColor: colors.primaryLight }}>
               <Star size={12} color={colors.primary} fill={colors.primary} />
-              <Text className="text-primary text-xs font-bold ml-0.5">{store.rating.toFixed(1)}</Text>
-              <Text className="text-primary text-[10px] ml-1">({store.reviews_count})</Text>
+              <Text className="text-primary text-xs font-bold ml-0.5" style={{ color: colors.primary }}>{store.rating.toFixed(1)}</Text>
+              <Text className="text-primary text-[10px] ml-1" style={{ color: colors.primary }}>({store.reviews_count})</Text>
             </View>
             <View className="flex-row items-center mr-3 mb-1">
               <Clock size={12} color={colors.textMuted} />
-              <Text className="text-muted text-xs ml-0.5">{store.delivery_time_minutes} min</Text>
+              <Text className="text-muted text-xs ml-0.5" style={{ color: colors.textMuted }}>{store.delivery_time_minutes} min</Text>
             </View>
             <View className="flex-row items-center mr-3 mb-1">
               <Bike size={12} color={colors.textMuted} />
-              <Text className="text-muted text-xs ml-0.5">{formatCurrency(store.delivery_fee)} delivery</Text>
+              <Text className="text-muted text-xs ml-0.5" style={{ color: colors.textMuted }}>{formatCurrency(store.delivery_fee)} delivery</Text>
             </View>
             <View className="flex-row items-center mb-1">
               <ShoppingBag size={12} color={colors.textMuted} />
-              <Text className="text-muted text-xs ml-0.5">Min {formatCurrency(store.minimum_order)}</Text>
+              <Text className="text-muted text-xs ml-0.5" style={{ color: colors.textMuted }}>Min {formatCurrency(store.minimum_order)}</Text>
             </View>
           </View>
 
-          <View className="flex-row items-center mt-3 pt-3 border-t border-lineLight">
+          <View className="flex-row items-center mt-3 pt-3 border-t border-lineLight" style={{ borderTopColor: colors.borderLight }}>
             <MapPin size={12} color={colors.textMuted} />
-            <Text className="text-muted text-xs ml-1 flex-1">{store.address}</Text>
+            <Text className="text-muted text-xs ml-1 flex-1" style={{ color: colors.textMuted }}>{store.address}</Text>
             {!store.is_open && (
               <Text className="text-xs font-semibold" style={{ color: colors.error }}>Closed now</Text>
             )}
@@ -146,7 +148,7 @@ export default function StoreScreen() {
 
         {/* Search within store */}
         <View className="px-5 pt-4">
-          <View className="flex-row items-center bg-surface rounded-xl2 px-3.5 py-2.5 border border-line">
+          <View className="flex-row items-center bg-surface rounded-xl2 px-3.5 py-2.5 border border-line" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
             <Search size={16} color={colors.textMuted} />
             <TextInput
               value={query}
@@ -154,6 +156,7 @@ export default function StoreScreen() {
               placeholder={`Search in ${store.name}...`}
               placeholderTextColor={colors.textMuted}
               className="flex-1 ml-2 text-sm text-textmain"
+              style={{ color: colors.text }}
             />
           </View>
         </View>
@@ -181,8 +184,8 @@ export default function StoreScreen() {
         {filtered.length === 0 && (
           <View className="items-center py-12">
             <Text className="text-3xl">🔍</Text>
-            <Text className="text-textmain font-semibold text-sm mt-2">No items found</Text>
-            <Text className="text-muted text-xs">Try a different search or category</Text>
+            <Text className="text-textmain font-semibold text-sm mt-2" style={{ color: colors.text }}>No items found</Text>
+            <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Try a different search or category</Text>
           </View>
         )}
       </ScrollView>
@@ -191,6 +194,7 @@ export default function StoreScreen() {
 }
 
 function CatChip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  const colors = useThemeColors();
   return (
     <Pressable
       onPress={onPress}

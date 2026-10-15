@@ -1,11 +1,13 @@
 /**
  * MembershipCard — FoodMunch Gold membership promo card.
  * Gold gradient + member perks + CTA button.
+ *
+ * Per dark-mode spec: the gold gradient + brown ink text stay identical in
+ * both modes (colorful banners don't switch).
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { Crown, Sparkles, ChevronRight } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
 
 interface Props {
   onPress?: () => void;

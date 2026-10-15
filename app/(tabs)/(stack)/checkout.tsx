@@ -9,7 +9,7 @@ import {
   Smartphone, Tag, CheckCircle2, ChevronRight, ShoppingBag, Bike,
   ShieldCheck, Zap, AlertTriangle, Navigation
 } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useCartStore } from '@/store/cart';
 import { useUserStore } from '@/store/user';
 import { useAuthStore } from '@/store/auth';
@@ -21,6 +21,7 @@ import { hapticNotify } from '@/utils/platform';
 
 export default function CheckoutScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const items = useCartStore((s) => s.items);
   const storeId = useCartStore((s) => s.storeId);
   const storeName = useCartStore((s) => s.storeName);
@@ -98,7 +99,7 @@ export default function CheckoutScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
         <View className="flex-1 items-center justify-center px-6">
           <ShoppingBag size={48} color={colors.textMuted} />
-          <Text className="text-textmain font-bold text-base mt-3">Your cart is empty</Text>
+          <Text className="text-textmain font-bold text-base mt-3" style={{ color: colors.text }}>Your cart is empty</Text>
           <Pressable
             onPress={() => router.replace('/(tabs)')}
             className="mt-4 rounded-xl2 px-6 py-3"
@@ -194,36 +195,37 @@ export default function CheckoutScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <View className="px-5 pt-2 pb-3 flex-row items-center">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3" style={{ backgroundColor: colors.surface, borderColor: colors.borderLight }}>
           <ArrowLeft size={18} color={colors.text} />
         </Pressable>
-        <Text className="text-textmain text-[22px] font-extrabold tracking-tight">Checkout</Text>
+        <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>Checkout</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 220 }}>
         {/* Address */}
-        <Section title="Delivery Address">
+        <Section title="Delivery Address" colors={colors}>
           {selectedAddr ? (
             <Pressable
               onPress={() => router.push('/address')}
               className="bg-white rounded-xl2 border border-line p-3.5 flex-row active:opacity-80"
+              style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}
             >
               <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
                 <MapPin size={16} color={colors.primary} />
               </View>
               <View className="flex-1 ml-3">
                 <View className="flex-row items-center">
-                  <Text className="text-textmain font-semibold text-sm">{selectedAddr.label}</Text>
+                  <Text className="text-textmain font-semibold text-sm" style={{ color: colors.text }}>{selectedAddr.label}</Text>
                   {selectedAddr.is_default && (
                     <View className="ml-2 px-1.5 py-0.5 rounded" style={{ backgroundColor: colors.primaryLight }}>
-                      <Text className="text-primary text-[9px] font-bold uppercase">Default</Text>
+                      <Text className="text-primary text-[9px] font-bold uppercase" style={{ color: colors.primary }}>Default</Text>
                     </View>
                   )}
                 </View>
-                <Text className="text-muted text-xs mt-0.5" numberOfLines={2}>
+                <Text className="text-muted text-xs mt-0.5" style={{ color: colors.textMuted }} numberOfLines={2}>
                   {selectedAddr.line1}, {selectedAddr.line2 ? selectedAddr.line2 + ', ' : ''}{selectedAddr.city} - {selectedAddr.pincode}
                 </Text>
-                <Text className="text-muted text-[11px] mt-0.5">{selectedAddr.full_name} • {selectedAddr.phone}</Text>
+                <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>{selectedAddr.full_name} • {selectedAddr.phone}</Text>
               </View>
               <ChevronRight size={16} color={colors.textSubtle} />
             </Pressable>
@@ -234,7 +236,7 @@ export default function CheckoutScreen() {
               style={{ borderColor: colors.primary }}
             >
               <Plus size={18} color={colors.primary} />
-              <Text className="text-primary text-sm font-semibold mt-1">Add new address</Text>
+              <Text className="text-primary text-sm font-semibold mt-1" style={{ color: colors.primary }}>Add new address</Text>
             </Pressable>
           )}
 
@@ -244,19 +246,19 @@ export default function CheckoutScreen() {
               {checkingPincode ? (
                 <View className="flex-row items-center px-1 py-1">
                   <ActivityIndicator size="small" color={colors.primary} />
-                  <Text className="text-muted text-xs ml-2">Checking delivery to {selectedAddr.pincode}…</Text>
+                  <Text className="text-muted text-xs ml-2" style={{ color: colors.textMuted }}>Checking delivery to {selectedAddr.pincode}…</Text>
                 </View>
               ) : deliveryArea ? (
                 <View className="flex-row items-center px-2 py-1.5 rounded-md" style={{ backgroundColor: colors.successLight }}>
                   <CheckCircle2 size={12} color={colors.success} />
-                  <Text className="text-success text-[11px] font-medium ml-1">
+                  <Text className="text-success text-[11px] font-medium ml-1" style={{ color: colors.success }}>
                     Delivers to {selectedAddr.pincode} • {deliveryArea.estimated_minutes} min • {formatCurrency(deliveryArea.delivery_fee)} fee
                   </Text>
                 </View>
               ) : (
                 <View className="flex-row items-center px-2 py-1.5 rounded-md" style={{ backgroundColor: colors.errorLight }}>
                   <AlertTriangle size={12} color={colors.error} />
-                  <Text className="text-error text-[11px] font-medium ml-1">
+                  <Text className="text-error text-[11px] font-medium ml-1" style={{ color: colors.error }}>
                     Not deliverable to {selectedAddr.pincode}. Pick another address or store.
                   </Text>
                 </View>
@@ -266,12 +268,12 @@ export default function CheckoutScreen() {
         </Section>
 
         {/* Schedule */}
-        <Section title="Delivery Time">
-          <View className="flex-row bg-surface rounded-xl2 p-1 border border-line">
+        <Section title="Delivery Time" colors={colors}>
+          <View className="flex-row bg-surface rounded-xl2 p-1 border border-line" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
             <Pressable
               onPress={() => setSchedule('now')}
               className="flex-1 py-2.5 rounded-xl flex-row items-center justify-center"
-              style={{ backgroundColor: schedule === 'now' ? '#fff' : 'transparent', elevation: schedule === 'now' ? 2 : 0, shadowColor: '#0F172A', shadowOpacity: schedule === 'now' ? 0.08 : 0, shadowRadius: 4 }}
+              style={{ backgroundColor: schedule === 'now' ? colors.surfaceElevated : 'transparent', elevation: schedule === 'now' ? 2 : 0, shadowColor: '#000', shadowOpacity: schedule === 'now' ? 0.08 : 0, shadowRadius: 4 }}
             >
               <Clock size={13} color={schedule === 'now' ? colors.primary : colors.textMuted} />
               <Text className="ml-1.5 text-sm font-semibold" style={{ color: schedule === 'now' ? colors.primary : colors.textMuted }}>
@@ -281,7 +283,7 @@ export default function CheckoutScreen() {
             <Pressable
               onPress={() => setSchedule('later')}
               className="flex-1 py-2.5 rounded-xl flex-row items-center justify-center"
-              style={{ backgroundColor: schedule === 'later' ? '#fff' : 'transparent', elevation: schedule === 'later' ? 2 : 0, shadowColor: '#0F172A', shadowOpacity: schedule === 'later' ? 0.08 : 0, shadowRadius: 4 }}
+              style={{ backgroundColor: schedule === 'later' ? colors.surfaceElevated : 'transparent', elevation: schedule === 'later' ? 2 : 0, shadowColor: '#000', shadowOpacity: schedule === 'later' ? 0.08 : 0, shadowRadius: 4 }}
             >
               <Clock size={13} color={schedule === 'later' ? colors.primary : colors.textMuted} />
               <Text className="ml-1.5 text-sm font-semibold" style={{ color: schedule === 'later' ? colors.primary : colors.textMuted }}>
@@ -292,14 +294,15 @@ export default function CheckoutScreen() {
         </Section>
 
         {/* Notes */}
-        <Section title="Delivery Instructions">
-          <View className="bg-white rounded-xl2 border border-line px-3.5 py-2.5">
+        <Section title="Delivery Instructions" colors={colors}>
+          <View className="bg-white rounded-xl2 border border-line px-3.5 py-2.5" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
             <TextInput
               value={note}
               onChangeText={setNote}
               placeholder="e.g. Ring the bell on arrival, leave at door, etc."
               placeholderTextColor={colors.textMuted}
               className="text-sm text-textmain"
+              style={{ color: colors.text }}
               multiline
               numberOfLines={2}
             />
@@ -307,17 +310,18 @@ export default function CheckoutScreen() {
         </Section>
 
         {/* Wallet */}
-        <Section title="Wallet">
+        <Section title="Wallet" colors={colors}>
           <Pressable
             onPress={() => setUseWallet(!useWallet)}
             className="bg-white rounded-xl2 border border-line p-3.5 flex-row items-center active:opacity-80"
+            style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}
           >
             <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
               <Wallet size={16} color={colors.primary} />
             </View>
             <View className="flex-1 ml-3">
-              <Text className="text-textmain text-sm font-semibold">Food Munch Wallet</Text>
-              <Text className="text-muted text-[11px]">Balance: {formatCurrency(walletBalance)}</Text>
+              <Text className="text-textmain text-sm font-semibold" style={{ color: colors.text }}>Food Munch Wallet</Text>
+              <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>Balance: {formatCurrency(walletBalance)}</Text>
             </View>
             <View
               className="w-5 h-5 rounded-full items-center justify-center"
@@ -327,25 +331,25 @@ export default function CheckoutScreen() {
             </View>
           </Pressable>
           {useWallet && (
-            <Text className="text-muted text-[11px] mt-1 px-1">
+            <Text className="text-muted text-[11px] mt-1 px-1" style={{ color: colors.textMuted }}>
               {formatCurrency(Math.min(walletBalance, total))} will be deducted. Payable after wallet: {formatCurrency(finalTotal)}.
             </Text>
           )}
         </Section>
 
         {/* Payment */}
-        <Section title="Payment Method">
-          <View className="bg-white rounded-xl2 border border-line overflow-hidden">
-            <PaymentRow icon={<Banknote size={16} color={colors.success} />} iconBg={colors.successLight} label="Cash on Delivery" sub="Pay when you receive" selected={payment === 'cash'} onPress={() => setPayment('cash')} />
-            <Divider />
-            <PaymentRow icon={<CreditCard size={16} color={colors.info} />} iconBg={colors.infoLight} label="Credit / Debit Card" sub="Visa, Mastercard, RuPay" selected={payment === 'card'} onPress={() => setPayment('online')} />
-            <Divider />
-            <PaymentRow icon={<Smartphone size={16} color={colors.warning} />} iconBg={colors.warningLight} label="UPI / Razorpay" sub={isRazorpayConfigured ? 'GPay, PhonePe, Paytm, Cards' : 'Mock mode (test)'} selected={payment === 'online'} onPress={() => setPayment('online')} badge={isRazorpayConfigured ? <RazorpayBadge /> : <MockBadge />} />
+        <Section title="Payment Method" colors={colors}>
+          <View className="bg-white rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <PaymentRow icon={<Banknote size={16} color={colors.success} />} iconBg={colors.successLight} label="Cash on Delivery" sub="Pay when you receive" selected={payment === 'cash'} onPress={() => setPayment('cash')} colors={colors} />
+            <Divider colors={colors} />
+            <PaymentRow icon={<CreditCard size={16} color={colors.info} />} iconBg={colors.infoLight} label="Credit / Debit Card" sub="Visa, Mastercard, RuPay" selected={payment === 'card'} onPress={() => setPayment('online')} colors={colors} />
+            <Divider colors={colors} />
+            <PaymentRow icon={<Smartphone size={16} color={colors.warning} />} iconBg={colors.warningLight} label="UPI / Razorpay" sub={isRazorpayConfigured ? 'GPay, PhonePe, Paytm, Cards' : 'Mock mode (test)'} selected={payment === 'online'} onPress={() => setPayment('online')} badge={isRazorpayConfigured ? <RazorpayBadge /> : <MockBadge />} colors={colors} />
           </View>
           {payment === 'online' && (
             <View className="mt-2 flex-row items-center px-1">
               <ShieldCheck size={11} color={colors.success} />
-              <Text className="text-muted text-[11px] ml-1">
+              <Text className="text-muted text-[11px] ml-1" style={{ color: colors.textMuted }}>
                 Secured by Razorpay. Your card details are never stored on our servers.
               </Text>
             </View>
@@ -353,26 +357,27 @@ export default function CheckoutScreen() {
         </Section>
 
         {/* Coupon */}
-        <Section title="Coupon">
+        <Section title="Coupon" colors={colors}>
           <Pressable
             onPress={() => router.push('/coupons')}
             className="bg-white rounded-xl2 border border-line p-3.5 flex-row items-center justify-between active:opacity-80"
+            style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}
           >
             <View className="flex-row items-center">
               <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: colors.warningLight }}>
                 <Tag size={16} color={colors.warning} />
               </View>
               <View className="ml-3">
-                <Text className="text-textmain text-sm font-semibold">
+                <Text className="text-textmain text-sm font-semibold" style={{ color: colors.text }}>
                   {appliedCoupon ? appliedCoupon.code : 'Apply coupon'}
                 </Text>
-                <Text className="text-muted text-[11px]">
+                <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>
                   {appliedCoupon ? appliedCoupon.title : 'Save up to ₹100 on this order'}
                 </Text>
               </View>
             </View>
             {appliedCoupon ? (
-              <Text className="text-success text-xs font-bold">− {formatCurrency(discount)}</Text>
+              <Text className="text-success text-xs font-bold" style={{ color: colors.success }}>− {formatCurrency(discount)}</Text>
             ) : (
               <ChevronRight size={16} color={colors.primary} />
             )}
@@ -380,28 +385,28 @@ export default function CheckoutScreen() {
         </Section>
 
         {/* Order summary */}
-        <Section title="Order Summary">
-          <View className="bg-white rounded-xl2 border border-line p-3.5">
+        <Section title="Order Summary" colors={colors}>
+          <View className="bg-white rounded-xl2 border border-line p-3.5" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
             <View className="flex-row items-center justify-between mb-1">
-              <Text className="text-muted text-xs">Store</Text>
-              <Text className="text-textmain text-xs font-semibold">{storeName}</Text>
+              <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Store</Text>
+              <Text className="text-textmain text-xs font-semibold" style={{ color: colors.text }}>{storeName}</Text>
             </View>
             <View className="flex-row items-center justify-between mb-1">
-              <Text className="text-muted text-xs">Items</Text>
-              <Text className="text-textmain text-xs font-semibold">{items.length}</Text>
+              <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Items</Text>
+              <Text className="text-textmain text-xs font-semibold" style={{ color: colors.text }}>{items.length}</Text>
             </View>
-            <View className="h-px bg-line my-2.5" />
-            <BillRow label="Subtotal" value={formatCurrency(subtotal)} />
-            <BillRow label="Delivery fee" value={effectiveDeliveryFee === 0 ? 'FREE' : formatCurrency(effectiveDeliveryFee)} valueColor={effectiveDeliveryFee === 0 ? colors.success : colors.text} />
-            {discount > 0 && <BillRow label="Coupon discount" value={`− ${formatCurrency(discount)}`} valueColor={colors.success} />}
-            <BillRow label="Taxes (5%)" value={formatCurrency(tax)} />
+            <View className="h-px bg-line my-2.5" style={{ backgroundColor: colors.borderLight }} />
+            <BillRow label="Subtotal" value={formatCurrency(subtotal)} colors={colors} />
+            <BillRow label="Delivery fee" value={effectiveDeliveryFee === 0 ? 'FREE' : formatCurrency(effectiveDeliveryFee)} valueColor={effectiveDeliveryFee === 0 ? colors.success : colors.text} colors={colors} />
+            {discount > 0 && <BillRow label="Coupon discount" value={`− ${formatCurrency(discount)}`} valueColor={colors.success} colors={colors} />}
+            <BillRow label="Taxes (5%)" value={formatCurrency(tax)} colors={colors} />
             {useWallet && walletApplied > 0 && (
-              <BillRow label="Wallet applied" value={`− ${formatCurrency(walletApplied)}`} valueColor={colors.success} />
+              <BillRow label="Wallet applied" value={`− ${formatCurrency(walletApplied)}`} valueColor={colors.success} colors={colors} />
             )}
-            <View className="h-px bg-line my-2.5" />
+            <View className="h-px bg-line my-2.5" style={{ backgroundColor: colors.borderLight }} />
             <View className="flex-row justify-between">
-              <Text className="text-textmain font-bold text-base">Total</Text>
-              <Text className="text-textmain font-bold text-base">{formatCurrency(finalTotal)}</Text>
+              <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>Total</Text>
+              <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>{formatCurrency(finalTotal)}</Text>
             </View>
           </View>
         </Section>
@@ -410,16 +415,16 @@ export default function CheckoutScreen() {
       {/* Sticky place order bar */}
       <View
         className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-3 pb-4 border-t border-line"
-        style={{ borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 8, shadowColor: '#0F172A', shadowOpacity: 0.1, shadowRadius: 12 }}
+        style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 8, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12 }}
       >
         <View className="flex-row items-center justify-between mb-2.5">
           <View>
-            <Text className="text-muted text-[11px]">Total payable</Text>
-            <Text className="text-textmain font-bold text-lg">{formatCurrency(finalTotal)}</Text>
+            <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>Total payable</Text>
+            <Text className="text-textmain font-bold text-lg" style={{ color: colors.text }}>{formatCurrency(finalTotal)}</Text>
           </View>
           <View className="flex-row items-center px-2 py-1 rounded-md" style={{ backgroundColor: colors.primaryLight }}>
             <Bike size={11} color={colors.primary} />
-            <Text className="text-primary text-[11px] font-semibold ml-0.5">
+            <Text className="text-primary text-[11px] font-semibold ml-0.5" style={{ color: colors.primary }}>
               {deliveryArea ? `${deliveryArea.estimated_minutes} min` : '30-40 min'}
             </Text>
           </View>
@@ -457,26 +462,26 @@ export default function CheckoutScreen() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, colors, children }: { title: string; colors: any; children: React.ReactNode }) {
   return (
     <View className="px-5 mt-4">
-      <Text className="text-textmain text-sm font-bold mb-2">{title}</Text>
+      <Text className="text-textmain text-sm font-bold mb-2" style={{ color: colors.text }}>{title}</Text>
       {children}
     </View>
   );
 }
 
-function BillRow({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
+function BillRow({ label, value, valueColor, colors }: { label: string; value: string; valueColor?: string; colors: any }) {
   return (
     <View className="flex-row justify-between mb-1.5">
-      <Text className="text-muted text-sm">{label}</Text>
-      <Text className="text-textmain text-sm font-medium" style={{ color: valueColor }}>{value}</Text>
+      <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>{label}</Text>
+      <Text className="text-textmain text-sm font-medium" style={{ color: valueColor || colors.text }}>{value}</Text>
     </View>
   );
 }
 
 function PaymentRow({
-  icon, iconBg, label, sub, selected, onPress, badge
+  icon, iconBg, label, sub, selected, onPress, badge, colors
 }: {
   icon: React.ReactNode;
   iconBg: string;
@@ -485,6 +490,7 @@ function PaymentRow({
   selected: boolean;
   onPress: () => void;
   badge?: React.ReactNode;
+  colors: any;
 }) {
   return (
     <Pressable onPress={onPress} className="flex-row items-center px-3.5 py-3 active:opacity-80">
@@ -493,10 +499,10 @@ function PaymentRow({
       </View>
       <View className="flex-1 ml-3">
         <View className="flex-row items-center">
-          <Text className="text-textmain text-sm font-medium">{label}</Text>
+          <Text className="text-textmain text-sm font-medium" style={{ color: colors.text }}>{label}</Text>
           {badge}
         </View>
-        <Text className="text-muted text-[11px]">{sub}</Text>
+        <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>{sub}</Text>
       </View>
       <View
         className="w-5 h-5 rounded-full items-center justify-center"
@@ -509,21 +515,23 @@ function PaymentRow({
 }
 
 function RazorpayBadge() {
+  const colors = useThemeColors();
   return (
     <View className="ml-2 px-1.5 py-0.5 rounded" style={{ backgroundColor: colors.primaryLight }}>
-      <Text className="text-primary text-[8px] font-bold uppercase">Razorpay</Text>
+      <Text className="text-primary text-[8px] font-bold uppercase" style={{ color: colors.primary }}>Razorpay</Text>
     </View>
   );
 }
 
 function MockBadge() {
+  const colors = useThemeColors();
   return (
     <View className="ml-2 px-1.5 py-0.5 rounded" style={{ backgroundColor: colors.warningLight }}>
-      <Text className="text-warning text-[8px] font-bold uppercase">Mock</Text>
+      <Text className="text-warning text-[8px] font-bold uppercase" style={{ color: colors.warning }}>Mock</Text>
     </View>
   );
 }
 
-function Divider() {
+function Divider({ colors }: { colors: any }) {
   return <View style={{ height: 1, backgroundColor: colors.border, marginLeft: 60 }} />;
 }

@@ -8,13 +8,15 @@
  *   - Next card peeks at right edge
  *
  * Smooth horizontal scroll with momentum (decelerationRate="fast").
+ *
+ * Dark-mode aware — card surface, text colours, image-wrap bg adapt.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions, FlatList } from 'react-native';
 import { Image } from 'expo-image';
 import { ChevronRight } from 'lucide-react-native';
 import type { Product } from '@/lib/types';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { formatCurrency, effectivePrice } from '@/utils/format';
 import { getProductImage } from '@/utils/images';
 import { useRouter } from 'expo-router';
@@ -50,17 +52,20 @@ export function FeaturedCarousel({
   tagFor
 }: Props) {
   const router = useRouter();
+  const colors = useThemeColors();
 
   return (
     <View style={styles.section}>
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+          {subtitle ? (
+            <Text style={[styles.subtitle, { color: colors.textMuted }]}>{subtitle}</Text>
+          ) : null}
         </View>
         {onSeeAll && (
           <Pressable onPress={onSeeAll} style={styles.seeAll}>
-            <Text style={styles.seeAllText}>See all</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>See all</Text>
             <ChevronRight size={13} color={colors.primary} strokeWidth={2.5} />
           </Pressable>
         )}
@@ -81,7 +86,7 @@ export function FeaturedCarousel({
           return (
             <Pressable
               onPress={() => router.push(`/product/${item.id}`)}
-              style={styles.card}
+              style={[styles.card, { backgroundColor: colors.surfaceElevated }]}
             >
               {/* Tag */}
               <View style={[styles.tag, { backgroundColor: tag.bg }]}>
@@ -91,7 +96,7 @@ export function FeaturedCarousel({
               </View>
 
               {/* Image */}
-              <View style={styles.imageWrap}>
+              <View style={[styles.imageWrap, { backgroundColor: colors.surfaceAlt }]}>
                 {getProductImage(item.name) ? (
                   <Image
                     source={getProductImage(item.name)}
@@ -108,17 +113,17 @@ export function FeaturedCarousel({
               {/* Body */}
               <View style={styles.body}>
                 {item.brand ? (
-                  <Text style={styles.brand} numberOfLines={1}>
+                  <Text style={[styles.brand, { color: colors.textMuted }]} numberOfLines={1}>
                     {item.brand}
                   </Text>
                 ) : null}
-                <Text style={styles.name} numberOfLines={2}>
+                <Text style={[styles.name, { color: colors.text }]} numberOfLines={2}>
                   {item.name}
                 </Text>
                 <View style={styles.priceRow}>
-                  <Text style={styles.price}>{formatCurrency(price)}</Text>
+                  <Text style={[styles.price, { color: colors.text }]}>{formatCurrency(price)}</Text>
                   {item.discount_price ? (
-                    <Text style={styles.mrp}>
+                    <Text style={[styles.mrp, { color: colors.textMuted }]}>
                       {formatCurrency(item.price)}
                     </Text>
                   ) : null}
@@ -146,12 +151,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '900',
-    color: colors.text,
     letterSpacing: -0.4
   },
   subtitle: {
     fontSize: 12,
-    color: colors.textMuted,
     marginTop: 2
   },
   seeAll: {
@@ -159,13 +162,11 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   seeAllText: {
-    color: colors.primary,
     fontSize: 13,
     fontWeight: '700'
   },
   card: {
     width: CARD_WIDTH,
-    backgroundColor: '#fff',
     borderRadius: 14,
     borderWidth: 2,
     borderColor: '#2196F3',
@@ -188,8 +189,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F0F9FF'
+    justifyContent: 'center'
   },
   image: {
     width: '100%',
@@ -203,14 +203,12 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 9,
-    color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
     marginBottom: 1
   },
   name: {
     fontSize: 12,
-    color: colors.text,
     fontWeight: '600',
     lineHeight: 14,
     minHeight: 28
@@ -223,12 +221,10 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 14,
-    color: colors.text,
     fontWeight: '800'
   },
   mrp: {
     fontSize: 10,
-    color: colors.textMuted,
     textDecorationLine: 'line-through'
   }
 });

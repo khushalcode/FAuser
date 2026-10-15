@@ -6,13 +6,16 @@
  *   - Red for Durga Pujo (Sondesh & Sweets, Pooja Thali, Flowers & Garlands, Dhak & Decor)
  *
  * Tap sub-tile → navigates to filtered products (via tag).
+ *
+ * Per dark-mode spec: the colourful gradient + white sub-tiles stay identical
+ * in both modes (colorful banners don't switch). The sub-tile label stays a
+ * fixed dark ink so it reads correctly against the always-white sub-tile.
  */
 import React from 'react';
 import {
   View, Text, Pressable, StyleSheet, Dimensions
 } from 'react-native';
 import type { FestivalTileData } from '@/data/mock-data';
-import { colors } from '@/theme/colors';
 import { useRouter } from 'expo-router';
 
 interface Props {
@@ -21,6 +24,8 @@ interface Props {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const H_PAD = 16;
+
+const SUBTILE_LABEL_COLOR = '#101828'; // dark ink — sub-tile bg is always white
 
 export function FestivalTile({ tile }: Props) {
   const router = useRouter();
@@ -151,7 +156,7 @@ const styles = StyleSheet.create({
   subTileLabel: {
     fontSize: 9,
     fontWeight: '700',
-    color: colors.text,
+    color: SUBTILE_LABEL_COLOR,
     textAlign: 'center',
     lineHeight: 11
   }

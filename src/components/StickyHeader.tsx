@@ -18,9 +18,10 @@ import {
   View, Text, Pressable, StyleSheet, Animated
 } from 'react-native';
 import { MapPin, ChevronDown, Clock, Wallet, Bell } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { SearchBar } from './SearchBar';
 import { TabRow, TabItem } from './TabRow';
+import { ThemeToggle } from './ThemeToggle';
 import { useUserStore } from '@/store/user';
 import { useAuthStore } from '@/store/auth';
 import { formatCurrency } from '@/utils/format';
@@ -69,6 +70,7 @@ export function StickyHeader({
   const user = useAuthStore((s) => s.user);
   const wa = useUserStore((s) => s.walletBalance);
   const balance = walletBalance ?? wa ?? 0;
+  const colors = useThemeColors();
 
   // 0 = expanded, 1 = collapsed
   const collapse = scrollY.interpolate({
@@ -104,7 +106,7 @@ export function StickyHeader({
         }
       ]}
     >
-      {/* Top row — brand + delivery location + wallet + bell + avatar */}
+      {/* Top row — brand + delivery location + wallet + bell + theme + avatar */}
       <View style={styles.topRow}>
         {/* Brand + delivery */}
         <Animated.View
@@ -157,6 +159,10 @@ export function StickyHeader({
             <Bell size={17} color="#fff" strokeWidth={2.2} />
             <View style={styles.bellDot} />
           </Pressable>
+          {/* Theme toggle — sits on the colored header tint */}
+          <View style={styles.themeToggleWrap}>
+            <ThemeToggle size="sm" />
+          </View>
           <Pressable
             onPress={onProfilePress || (() => router.push('/(tabs)/profile'))}
             style={styles.avatarBtn}
@@ -178,7 +184,7 @@ export function StickyHeader({
       </View>
 
       {/* Tab row */}
-      <View style={styles.tabRow}>
+      <View style={[styles.tabRow, { backgroundColor: colors.background }]}>
         <TabRow
           tabs={tabs}
           active={activeTab}
@@ -197,7 +203,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 50,
-    backgroundColor: colors.primary,
     borderBottomWidth: 0,
     shadowColor: '#000',
     shadowRadius: 4,
@@ -257,7 +262,6 @@ const styles = StyleSheet.create({
   },
   deliveryBadgeText: {
     fontSize: 9,
-    color: colors.primary,
     fontWeight: '800'
   },
   actions: {
@@ -273,6 +277,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  themeToggleWrap: {
+    // Slightly smaller pill on the colored header for visual harmony
+    transform: [{ scale: 0.92 }],
+  },
   walletPill: {
     position: 'absolute',
     bottom: -3,
@@ -281,12 +289,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 5,
-    borderWidth: 1,
-    borderColor: colors.primary
+    borderWidth: 1
   },
   walletPillText: {
     fontSize: 8,
-    color: colors.primary,
     fontWeight: '800'
   },
   bellDot: {
@@ -297,8 +303,7 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 4,
     backgroundColor: '#F04438',
-    borderWidth: 1.5,
-    borderColor: colors.primary
+    borderWidth: 1.5
   },
   avatarBtn: {
     width: 36,
@@ -310,7 +315,6 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 13,
-    color: colors.primary,
     fontWeight: '900'
   },
   searchRow: {
@@ -318,7 +322,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6
   },
   tabRow: {
-    backgroundColor: '#fff',
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14
   }

@@ -2,10 +2,14 @@ import { Platform } from 'react-native';
 /**
  * LiveOrderBanner — shows a live order status banner at the top of home screen.
  * "Your order from Biryani Blues is on the way — Arriving in 8 mins"
+ *
+ * The card uses a fixed dark slate background by design (an attention-grabbing
+ * live-status card) — kept identical in both light and dark mode so the white
+ * text remains legible. Only the brand-emerald accents adapt to the theme.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, Animated, Easing } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 interface Props {
   storeName: string;
@@ -15,6 +19,7 @@ interface Props {
 }
 
 export function LiveOrderBanner({ storeName, etaMins, status, onPress }: Props) {
+  const colors = useThemeColors();
   const pulseAnim = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
@@ -49,11 +54,12 @@ export function LiveOrderBanner({ storeName, etaMins, status, onPress }: Props) 
         onPress={onPress}
         style={({ pressed }) => [styles.card, pressed && { opacity: 0.95 }]}
       >
-        <View style={styles.leftStrip}>
+        <View style={[styles.leftStrip, { backgroundColor: colors.primary }]}>
           <Animated.View
             style={[
               styles.pulseDot,
               {
+                backgroundColor: colors.primary,
                 opacity: pulseAnim.interpolate({
                   inputRange: [0, 1],
                   outputRange: [0.6, 1],
@@ -75,13 +81,13 @@ export function LiveOrderBanner({ storeName, etaMins, status, onPress }: Props) 
         </View>
         <View style={styles.body}>
           <View style={styles.titleRow}>
-            <Text style={styles.liveLabel}>LIVE ORDER</Text>
-            <Text style={styles.statusDot}>●</Text>
+            <Text style={[styles.liveLabel, { color: colors.primary }]}>LIVE ORDER</Text>
+            <Text style={[styles.statusDot, { color: colors.primary }]}>●</Text>
           </View>
           <Text style={styles.statusText} numberOfLines={1}>{statusText}</Text>
           <View style={styles.ctaRow}>
-            <Text style={styles.ctaText}>Track order</Text>
-            <Text style={styles.arrow}>→</Text>
+            <Text style={[styles.ctaText, { color: colors.primary }]}>Track order</Text>
+            <Text style={[styles.arrow, { color: colors.primary }]}>→</Text>
           </View>
         </View>
         <View style={styles.etaWrap}>
@@ -103,7 +109,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingRight: 14,
     paddingLeft: 0,
-    shadowColor: '#101828',
+    shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -112,7 +118,6 @@ const styles = StyleSheet.create({
   leftStrip: {
     width: 4,
     height: 50,
-    backgroundColor: colors.primary,
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
     marginRight: 10,
@@ -123,7 +128,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.primary,
     marginTop: 21,
   },
   emojiWrap: {
@@ -141,11 +145,9 @@ const styles = StyleSheet.create({
   liveLabel: {
     fontSize: 9,
     fontWeight: '800',
-    color: colors.primary,
     letterSpacing: 0.5,
   },
   statusDot: {
-    color: colors.primary,
     fontSize: 10,
     marginLeft: 4,
   },
@@ -157,12 +159,10 @@ const styles = StyleSheet.create({
   },
   ctaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
   ctaText: {
-    color: colors.primary,
     fontSize: 11,
     fontWeight: '700',
   },
   arrow: {
-    color: colors.primary,
     fontSize: 11,
     fontWeight: '700',
     marginLeft: 4,

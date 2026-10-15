@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Plus, ArrowDownLeft, ArrowUpRight, Wallet, TrendingUp, Gift } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useUserStore } from '@/store/user';
 import type { WalletTransaction } from '@/lib/types';
 import { formatCurrency, formatDate } from '@/utils/format';
@@ -14,6 +14,7 @@ import { hapticNotify } from '@/utils/platform';
 
 export default function WalletScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const balance = useUserStore((s) => s.walletBalance);
   const transactions = useUserStore((s) => s.walletTransactions);
   const addMoney = useUserStore((s) => s.addMoney);
@@ -45,10 +46,10 @@ export default function WalletScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <View className="px-5 pt-2 pb-3 flex-row items-center">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3" style={{ backgroundColor: colors.surface, borderColor: colors.borderLight }}>
           <ArrowLeft size={18} color={colors.text} />
         </Pressable>
-        <Text className="text-textmain text-[22px] font-extrabold tracking-tight">My Wallet</Text>
+        <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>My Wallet</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
@@ -56,7 +57,7 @@ export default function WalletScreen() {
         <View className="px-5">
           <View
             className="rounded-2xl p-5"
-            style={{ backgroundColor: colors.primary, elevation: 6, shadowColor: '#12B76A', shadowOpacity: 0.3, shadowRadius: 12 }}
+            style={{ backgroundColor: colors.primary, elevation: 6, shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 12 }}
           >
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
@@ -77,7 +78,7 @@ export default function WalletScreen() {
                 style={{ backgroundColor: '#fff' }}
               >
                 <Plus size={14} color={colors.primary} />
-                <Text className="text-primary font-semibold text-sm ml-1.5">Add Money</Text>
+                <Text className="text-primary font-semibold text-sm ml-1.5" style={{ color: colors.primary }}>Add Money</Text>
               </Pressable>
               <Pressable
                 className="flex-1 flex-row items-center justify-center py-2.5 rounded-xl"
@@ -97,26 +98,26 @@ export default function WalletScreen() {
               key={a}
               onPress={() => { setAmount(String(a)); setShowAdd(true); }}
               className="flex-1 py-2.5 rounded-xl items-center mr-2 border border-line"
-              style={{ backgroundColor: '#fff' }}
+              style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}
             >
-              <Text className="text-textmain text-xs font-semibold">+{formatCurrency(a, false)}</Text>
+              <Text className="text-textmain text-xs font-semibold" style={{ color: colors.text }}>+{formatCurrency(a, false)}</Text>
             </Pressable>
           ))}
         </View>
 
         {/* Transactions */}
         <View className="px-5 mt-6">
-          <Text className="text-textmain text-sm font-bold mb-3">Transaction History</Text>
+          <Text className="text-textmain text-sm font-bold mb-3" style={{ color: colors.text }}>Transaction History</Text>
           {loading ? (
             <ActivityIndicator color={colors.primary} />
           ) : transactions.length === 0 ? (
             <View className="items-center py-12">
               <Text className="text-3xl">📊</Text>
-              <Text className="text-textmain font-semibold text-sm mt-2">No transactions yet</Text>
-              <Text className="text-muted text-xs">Add money to start using your wallet.</Text>
+              <Text className="text-textmain font-semibold text-sm mt-2" style={{ color: colors.text }}>No transactions yet</Text>
+              <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>Add money to start using your wallet.</Text>
             </View>
           ) : (
-            <View className="bg-white rounded-xl2 border border-line overflow-hidden">
+            <View className="bg-white rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
               {transactions.map((tx, idx) => {
                 const isCredit = tx.type === 'credit';
                 return (
@@ -130,8 +131,8 @@ export default function WalletScreen() {
                         {isCredit ? <ArrowDownLeft size={16} color={colors.success} /> : <ArrowUpRight size={16} color={colors.error} />}
                       </View>
                       <View className="flex-1 ml-3">
-                        <Text className="text-textmain text-sm font-medium" numberOfLines={1}>{tx.description}</Text>
-                        <Text className="text-muted text-[11px] mt-0.5">{formatDate(tx.created_at, true)}</Text>
+                        <Text className="text-textmain text-sm font-medium" style={{ color: colors.text }} numberOfLines={1}>{tx.description}</Text>
+                        <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>{formatDate(tx.created_at, true)}</Text>
                       </View>
                       <Text
                         className="text-sm font-bold"
@@ -151,13 +152,13 @@ export default function WalletScreen() {
       {/* Add money modal */}
       <Modal visible={showAdd} transparent animationType="slide" onRequestClose={() => setShowAdd(false)}>
         <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <View className="bg-white rounded-t-3xl px-5 pt-5 pb-8">
+          <View className="bg-white rounded-t-3xl px-5 pt-5 pb-8" style={{ backgroundColor: colors.surfaceElevated }}>
             <View className="w-10 h-1 rounded-full self-center mb-4" style={{ backgroundColor: colors.border }} />
-            <Text className="text-textmain text-lg font-bold">Add Money to Wallet</Text>
-            <Text className="text-muted text-xs mt-1">Top-up your wallet to pay for orders faster.</Text>
+            <Text className="text-textmain text-lg font-bold" style={{ color: colors.text }}>Add Money to Wallet</Text>
+            <Text className="text-muted text-xs mt-1" style={{ color: colors.textMuted }}>Top-up your wallet to pay for orders faster.</Text>
 
-            <View className="mt-4 flex-row items-center bg-surface rounded-xl2 px-3.5 py-3 border border-line">
-              <Text className="text-textmain text-lg font-bold">₹</Text>
+            <View className="mt-4 flex-row items-center bg-surface rounded-xl2 px-3.5 py-3 border border-line" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+              <Text className="text-textmain text-lg font-bold" style={{ color: colors.text }}>₹</Text>
               <TextInput
                 value={amount}
                 onChangeText={setAmount}
@@ -166,6 +167,7 @@ export default function WalletScreen() {
                 keyboardType="numeric"
                 autoFocus
                 className="flex-1 ml-2 text-textmain text-lg font-bold"
+                style={{ color: colors.text }}
               />
             </View>
 
@@ -175,8 +177,9 @@ export default function WalletScreen() {
                   key={a}
                   onPress={() => setAmount(String(a))}
                   className="py-2 px-3 rounded-md border border-line"
+                  style={{ borderColor: colors.border }}
                 >
-                  <Text className="text-textmain text-xs font-semibold">+{a}</Text>
+                  <Text className="text-textmain text-xs font-semibold" style={{ color: colors.text }}>+{a}</Text>
                 </Pressable>
               ))}
             </View>
@@ -192,7 +195,7 @@ export default function WalletScreen() {
               onPress={() => setShowAdd(false)}
               className="mt-2 py-2 items-center"
             >
-              <Text className="text-muted text-sm">Cancel</Text>
+              <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>Cancel</Text>
             </Pressable>
           </View>
         </View>

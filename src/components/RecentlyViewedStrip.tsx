@@ -1,12 +1,14 @@
 /**
  * RecentlyViewedStrip — horizontal scroll of recently viewed products.
  * Each item: small product card with image, name, price.
+ *
+ * Dark-mode aware — card surface, border, text all adapt.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { Star } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import type { Product } from '@/lib/types';
 import { formatCurrency, effectivePrice } from '@/utils/format';
 import { getProductImage } from '@/utils/images';
@@ -17,14 +19,17 @@ interface Props {
 }
 
 export function RecentlyViewedStrip({ products, onPress }: Props) {
+  const colors = useThemeColors();
   if (products.length === 0) return null;
 
   return (
     <View style={styles.wrap}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>👀 Recently Viewed</Text>
-          <Text style={styles.subtitle}>Pick up where you left off</Text>
+          <Text style={[styles.title, { color: colors.text }]}>👀 Recently Viewed</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+            Pick up where you left off
+          </Text>
         </View>
       </View>
       <ScrollView
@@ -39,7 +44,13 @@ export function RecentlyViewedStrip({ products, onPress }: Props) {
             <Pressable
               key={p.id}
               onPress={() => onPress?.(p)}
-              style={styles.card}
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.surfaceElevated,
+                  borderColor: colors.borderLight,
+                },
+              ]}
             >
               <View style={styles.imageWrap}>
                 {getProductImage(p.name) ? (
@@ -49,14 +60,14 @@ export function RecentlyViewedStrip({ products, onPress }: Props) {
                     <Text style={{ fontSize: 28 }}>{isFood ? '🍽️' : '🛒'}</Text>
                   </View>
                 )}
-                <View style={styles.ratingChip}>
+                <View style={[styles.ratingChip, { backgroundColor: colors.primary }]}>
                   <Star size={8} color="#fff" fill="#fff" />
                   <Text style={styles.ratingText}>{p.rating.toFixed(1)}</Text>
                 </View>
               </View>
-              <Text style={styles.name} numberOfLines={2}>{p.name}</Text>
-              <Text style={styles.unit} numberOfLines={1}>{p.unit}</Text>
-              <Text style={styles.price}>{formatCurrency(price)}</Text>
+              <Text style={[styles.name, { color: colors.text }]} numberOfLines={2}>{p.name}</Text>
+              <Text style={[styles.unit, { color: colors.textMuted }]} numberOfLines={1}>{p.unit}</Text>
+              <Text style={[styles.price, { color: colors.text }]}>{formatCurrency(price)}</Text>
             </Pressable>
           );
         })}
@@ -74,17 +85,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 10,
   },
-  title: { fontSize: 16, fontWeight: '700', color: colors.text },
-  subtitle: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  title: { fontSize: 16, fontWeight: '700' },
+  subtitle: { fontSize: 12, marginTop: 2 },
   scroll: { paddingHorizontal: 16, paddingBottom: 8 },
   card: {
     width: 120,
     marginRight: 10,
-    backgroundColor: '#fff',
     borderRadius: 14,
     padding: 8,
     borderWidth: 1,
-    borderColor: colors.borderLight,
     shadowColor: '#000',
     shadowOpacity: 0.04,
     shadowRadius: 4,
@@ -106,7 +115,6 @@ const styles = StyleSheet.create({
     right: 4,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary,
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 4,
@@ -120,19 +128,16 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 11,
     fontWeight: '600',
-    color: colors.text,
     lineHeight: 13,
     minHeight: 26,
   },
   unit: {
     fontSize: 9,
-    color: colors.textMuted,
     marginTop: 2,
   },
   price: {
     fontSize: 12,
     fontWeight: '800',
-    color: colors.text,
     marginTop: 2,
   },
 });

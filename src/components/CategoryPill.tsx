@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { Category } from '@/lib/types';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 interface Props {
   category: Category;
@@ -29,6 +29,7 @@ const EMOJI: Record<string, string> = {
 };
 
 export function CategoryPill({ category, onPress, size = 'md' }: Props) {
+  const colors = useThemeColors();
   // Use the loose `group` field (food | grocery) only to pick an accent color.
   // It is NOT used to filter — both groups show together.
   const accent = category.group === 'grocery' ? colors.primary : colors.warning;
@@ -46,9 +47,9 @@ export function CategoryPill({ category, onPress, size = 'md' }: Props) {
         <Text className="text-3xl">{EMOJI[category.slug] || '📦'}</Text>
       </View>
       <Text
-        className="text-textmain text-[11px] font-medium mt-1.5 text-center"
+        className="text-[11px] font-medium mt-1.5 text-center"
+        style={{ lineHeight: 14, color: colors.text }}
         numberOfLines={2}
-        style={{ lineHeight: 14 }}
       >
         {category.name}
       </Text>

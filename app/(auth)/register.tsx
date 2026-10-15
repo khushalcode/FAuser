@@ -6,12 +6,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, User, Phone, Eye, EyeOff, ShoppingBasket, Gift, ChevronLeft, Check } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useAuthStore } from '@/store/auth';
 import { hapticNotify } from '@/utils/platform';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const signUp = useAuthStore((s) => s.signUpWithEmail);
   const isLoading = useAuthStore((s) => s.isLoading);
   const error = useAuthStore((s) => s.error);
@@ -153,17 +154,18 @@ export default function RegisterScreen() {
               </View>
             )}
 
-            <Field label="Full Name" icon={<User size={18} color={colors.textMuted} />}>
+            <Field label="Full Name" icon={<User size={18} color={colors.textMuted} />} colors={colors}>
               <TextInput
                 value={fullName}
                 onChangeText={(t) => { setFullName(t); clearError(); }}
                 placeholder="Aarav Sharma"
                 placeholderTextColor={colors.textMuted}
                 className="flex-1 ml-2.5 text-sm text-textmain"
+                style={{ color: colors.text }}
               />
             </Field>
 
-            <Field label="Email Address" icon={<Mail size={18} color={colors.textMuted} />}>
+            <Field label="Email Address" icon={<Mail size={18} color={colors.textMuted} />} colors={colors}>
               <TextInput
                 value={email}
                 onChangeText={(t) => { setEmail(t); clearError(); }}
@@ -172,10 +174,11 @@ export default function RegisterScreen() {
                 autoCapitalize="none"
                 keyboardType="email-address"
                 className="flex-1 ml-2.5 text-sm text-textmain"
+                style={{ color: colors.text }}
               />
             </Field>
 
-            <Field label="Phone Number" icon={<Phone size={18} color={colors.textMuted} />}>
+            <Field label="Phone Number" icon={<Phone size={18} color={colors.textMuted} />} colors={colors}>
               <TextInput
                 value={phone}
                 onChangeText={setPhone}
@@ -183,10 +186,11 @@ export default function RegisterScreen() {
                 placeholderTextColor={colors.textMuted}
                 keyboardType="phone-pad"
                 className="flex-1 ml-2.5 text-sm text-textmain"
+                style={{ color: colors.text }}
               />
             </Field>
 
-            <Field label="Password" icon={<Lock size={18} color={colors.textMuted} />}>
+            <Field label="Password" icon={<Lock size={18} color={colors.textMuted} />} colors={colors}>
               <TextInput
                 value={password}
                 onChangeText={(t) => { setPassword(t); clearError(); }}
@@ -194,6 +198,7 @@ export default function RegisterScreen() {
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry={!showPwd}
                 className="flex-1 ml-2.5 text-sm text-textmain"
+                style={{ color: colors.text }}
               />
               <Pressable onPress={() => setShowPwd(!showPwd)} hitSlop={8}>
                 {showPwd ? <EyeOff size={18} color={colors.textMuted} /> : <Eye size={18} color={colors.textMuted} />}
@@ -221,7 +226,7 @@ export default function RegisterScreen() {
               </View>
             )}
 
-            <Field label="Confirm Password" icon={<Lock size={18} color={colors.textMuted} />}>
+            <Field label="Confirm Password" icon={<Lock size={18} color={colors.textMuted} />} colors={colors}>
               <TextInput
                 value={confirm}
                 onChangeText={setConfirm}
@@ -229,6 +234,7 @@ export default function RegisterScreen() {
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry={!showPwd}
                 className="flex-1 ml-2.5 text-sm text-textmain"
+                style={{ color: colors.text }}
               />
               {confirm && confirm === password && (
                 <View style={{ marginRight: 4 }}>
@@ -253,7 +259,7 @@ export default function RegisterScreen() {
               >
                 {agree && <Check size={12} color="#fff" />}
               </View>
-              <Text className="text-xs text-muted flex-1 leading-4">
+              <Text className="text-xs text-muted flex-1 leading-4" style={{ color: colors.textMuted }}>
                 I agree to the{' '}
                 <Text style={{ color: colors.primary, fontWeight: '600' }}>Terms of Service</Text>
                 {' '}and{' '}
@@ -288,9 +294,9 @@ export default function RegisterScreen() {
             </Pressable>
 
             <View className="flex-row items-center justify-center mt-6 mb-8">
-              <Text className="text-muted text-sm">Already have an account? </Text>
+              <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>Already have an account? </Text>
               <Link href="/login">
-                <Text className="text-primary text-sm font-semibold">Sign In</Text>
+                <Text className="text-primary text-sm font-semibold" style={{ color: colors.primary }}>Sign In</Text>
               </Link>
             </View>
           </Animated.View>
@@ -300,11 +306,11 @@ export default function RegisterScreen() {
   );
 }
 
-function Field({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
+function Field({ label, icon, colors, children }: { label: string; icon: React.ReactNode; colors: any; children: React.ReactNode }) {
   return (
     <View className="mb-4">
-      <Text className="text-textmain text-sm font-medium mb-1.5">{label}</Text>
-      <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line">
+      <Text className="text-textmain text-sm font-medium mb-1.5" style={{ color: colors.text }}>{label}</Text>
+      <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
         {icon}
         {children}
       </View>

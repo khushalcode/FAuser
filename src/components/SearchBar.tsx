@@ -14,7 +14,7 @@ import { Platform } from 'react-native';
 import React from 'react';
 import { Pressable, View, Text, TextInput, StyleSheet, Animated, Easing } from 'react-native';
 import { Search } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useRouter } from 'expo-router';
 
 const ROTATING_PLACEHOLDERS = [
@@ -51,6 +51,7 @@ export function SearchBar({
   collapsed = false
 }: Props) {
   const router = useRouter();
+  const colors = useThemeColors();
   const [idx, setIdx] = React.useState(0);
   const slide = React.useRef(new Animated.Value(0)).current; // 0 = visible, 1 = slid up + faded
 
@@ -92,7 +93,7 @@ export function SearchBar({
   return (
     <Pressable
       onPress={() => readOnly && router.push('/search')}
-      style={styles.wrap}
+      style={[styles.wrap, { backgroundColor: colors.surface, borderColor: colors.border }]}
       disabled={!readOnly}
     >
       <Search size={17} color={colors.textMuted} strokeWidth={2.4} />
@@ -103,6 +104,7 @@ export function SearchBar({
               style={[
                 styles.placeholder,
                 {
+                  color: colors.textMuted,
                   transform: [{ translateY }],
                   opacity
                 }
@@ -112,7 +114,7 @@ export function SearchBar({
               {ROTATING_PLACEHOLDERS[idx]}
             </Animated.Text>
           ) : (
-            <Text style={styles.placeholder} numberOfLines={1}>
+            <Text style={[styles.placeholder, { color: colors.textMuted }]} numberOfLines={1}>
               {displayPlaceholder || 'Search for restaurants, dishes, groceries...'}
             </Text>
           )}
@@ -125,7 +127,7 @@ export function SearchBar({
           onSubmitEditing={onSubmit}
           placeholder={displayPlaceholder || 'Search for restaurants, dishes, groceries...'}
           placeholderTextColor={colors.textMuted}
-          style={styles.input}
+          style={[styles.input, { color: colors.text }]}
           returnKeyType="search"
         />
       )}
@@ -137,12 +139,10 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 11,
-    borderWidth: 1,
-    borderColor: colors.border
+    borderWidth: 1
   },
   placeholderWrap: {
     flex: 1,
@@ -153,14 +153,12 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     fontSize: 13,
-    color: colors.textMuted,
     fontWeight: '500'
   },
   input: {
     flex: 1,
     marginLeft: 10,
     fontSize: 13,
-    color: colors.text,
     padding: 0
   }
 });

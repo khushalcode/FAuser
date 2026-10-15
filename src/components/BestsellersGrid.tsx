@@ -8,13 +8,18 @@
  *   - Tap → navigates to category products page
  *
  * Section title: "Bestsellers" with "See all ▸" on the right.
+ *
+ * Dark-mode aware — section header text + "See all" CTA adapt. Tile tint
+ * backgrounds are pastel category colours (kept identical in both modes
+ * per design spec) so the tile title + "+N more" badge stay a fixed dark
+ * ink for legibility against the always-light pastel surfaces.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { ChevronRight } from 'lucide-react-native';
 import type { BestsellerTile } from '@/data/mock-data';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useRouter } from 'expo-router';
 
 interface Props {
@@ -28,15 +33,19 @@ const TILE_GAP = 10;
 const H_PAD = 16;
 const TILE_WIDTH = (SCREEN_WIDTH - H_PAD * 2 - TILE_GAP * 2) / 3;
 
+/** Dark ink — tiles are always pastel, so text stays dark in both modes. */
+const INK_ON_PASTEL = '#101828';
+
 export function BestsellersGrid({ tiles, onSeeAll, onTilePress }: Props) {
   const router = useRouter();
+  const colors = useThemeColors();
   return (
     <View style={styles.section}>
       <View style={styles.header}>
-        <Text style={styles.title}>Bestsellers</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Bestsellers</Text>
         {onSeeAll && (
           <Pressable onPress={onSeeAll} style={styles.seeAll}>
-            <Text style={styles.seeAllText}>See all</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>See all</Text>
             <ChevronRight size={13} color={colors.primary} strokeWidth={2.5} />
           </Pressable>
         )}
@@ -54,7 +63,7 @@ export function BestsellersGrid({ tiles, onSeeAll, onTilePress }: Props) {
             style={[styles.tile, { backgroundColor: tile.tint }]}
           >
             {/* Title pinned at top */}
-            <Text style={styles.tileTitle} numberOfLines={2}>
+            <Text style={[styles.tileTitle, { color: INK_ON_PASTEL }]} numberOfLines={2}>
               {tile.title}
             </Text>
 
@@ -78,7 +87,9 @@ export function BestsellersGrid({ tiles, onSeeAll, onTilePress }: Props) {
 
             {/* +N more badge */}
             <View style={styles.moreBadge}>
-              <Text style={styles.moreText}>+{tile.moreCount} more</Text>
+              <Text style={[styles.moreText, { color: INK_ON_PASTEL }]}>
+                +{tile.moreCount} more
+              </Text>
             </View>
           </Pressable>
         ))}
@@ -101,7 +112,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '900',
-    color: colors.text,
     letterSpacing: -0.4
   },
   seeAll: {
@@ -109,7 +119,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   seeAllText: {
-    color: colors.primary,
     fontSize: 13,
     fontWeight: '700'
   },
@@ -131,7 +140,6 @@ const styles = StyleSheet.create({
   tileTitle: {
     fontSize: 11,
     fontWeight: '700',
-    color: colors.text,
     textAlign: 'center',
     lineHeight: 13,
     minHeight: 26
@@ -182,7 +190,6 @@ const styles = StyleSheet.create({
   },
   moreText: {
     fontSize: 9,
-    color: colors.text,
     fontWeight: '700'
   }
 });

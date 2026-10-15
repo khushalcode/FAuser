@@ -5,13 +5,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, MapPin, Plus, Home, Briefcase, MapPinned, Trash2, Edit3 } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useUserStore } from '@/store/user';
 import type { CustomerAddress } from '@/lib/types';
 import { truncate } from '@/utils/format';
 
 export default function AddressListScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const addresses = useUserStore((s) => s.addresses);
   const selectedAddressId = useUserStore((s) => s.selectedAddressId);
   const setSelectedAddress = useUserStore((s) => s.setSelectedAddress);
@@ -47,10 +48,10 @@ export default function AddressListScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <View className="px-5 pt-2 pb-3 flex-row items-center">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3" style={{ backgroundColor: colors.surface, borderColor: colors.borderLight }}>
           <ArrowLeft size={18} color={colors.text} />
         </Pressable>
-        <Text className="text-textmain text-[22px] font-extrabold tracking-tight">Saved Addresses</Text>
+        <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>Saved Addresses</Text>
       </View>
 
       {loading ? (
@@ -69,7 +70,7 @@ export default function AddressListScreen() {
               <Pressable
                 onPress={() => { setSelectedAddress(item.id); router.back(); }}
                 className="bg-white rounded-xl2 border p-4 active:opacity-80"
-                style={{ borderColor: isSelected ? colors.primary : colors.border, borderWidth: isSelected ? 1.5 : 1 }}
+                style={{ backgroundColor: colors.surfaceElevated, borderColor: isSelected ? colors.primary : colors.border, borderWidth: isSelected ? 1.5 : 1 }}
               >
                 <View className="flex-row items-center">
                   <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: bgFor(item.label) }}>
@@ -77,10 +78,10 @@ export default function AddressListScreen() {
                   </View>
                   <View className="flex-1 ml-3">
                     <View className="flex-row items-center">
-                      <Text className="text-textmain font-semibold text-sm">{item.label}</Text>
+                      <Text className="text-textmain font-semibold text-sm" style={{ color: colors.text }}>{item.label}</Text>
                       {item.is_default && (
                         <View className="ml-2 px-1.5 py-0.5 rounded" style={{ backgroundColor: colors.primaryLight }}>
-                          <Text className="text-primary text-[9px] font-bold uppercase">Default</Text>
+                          <Text className="text-primary text-[9px] font-bold uppercase" style={{ color: colors.primary }}>Default</Text>
                         </View>
                       )}
                       {isSelected && (
@@ -89,20 +90,20 @@ export default function AddressListScreen() {
                         </View>
                       )}
                     </View>
-                    <Text className="text-muted text-xs mt-0.5" numberOfLines={2}>
+                    <Text className="text-muted text-xs mt-0.5" style={{ color: colors.textMuted }} numberOfLines={2}>
                       {item.line1}, {item.line2 ? item.line2 + ', ' : ''}{item.city} - {item.pincode}
                     </Text>
-                    <Text className="text-muted text-[11px] mt-0.5">{item.full_name} • {item.phone}</Text>
+                    <Text className="text-muted text-[11px] mt-0.5" style={{ color: colors.textMuted }}>{item.full_name} • {item.phone}</Text>
                   </View>
                 </View>
                 <View className="flex-row justify-end mt-3">
-                  <Pressable className="flex-row items-center px-3 py-1.5 rounded-md mr-2 border border-line">
+                  <Pressable className="flex-row items-center px-3 py-1.5 rounded-md mr-2 border border-line" style={{ borderColor: colors.border }}>
                     <Edit3 size={12} color={colors.textMuted} />
-                    <Text className="text-muted text-xs ml-1">Edit</Text>
+                    <Text className="text-muted text-xs ml-1" style={{ color: colors.textMuted }}>Edit</Text>
                   </Pressable>
                   <Pressable onPress={() => onDelete(item)} className="flex-row items-center px-3 py-1.5 rounded-md border" style={{ borderColor: colors.errorLight }}>
                     <Trash2 size={12} color={colors.error} />
-                    <Text className="text-error text-xs ml-1">Delete</Text>
+                    <Text className="text-error text-xs ml-1" style={{ color: colors.error }}>Delete</Text>
                   </Pressable>
                 </View>
               </Pressable>
@@ -113,8 +114,8 @@ export default function AddressListScreen() {
               <View className="w-20 h-20 rounded-full items-center justify-center" style={{ backgroundColor: colors.surfaceAlt }}>
                 <MapPin size={36} color={colors.textMuted} />
               </View>
-              <Text className="text-textmain font-bold text-sm mt-3">No saved addresses</Text>
-              <Text className="text-muted text-xs mt-1">Add your first delivery address to get started.</Text>
+              <Text className="text-textmain font-bold text-sm mt-3" style={{ color: colors.text }}>No saved addresses</Text>
+              <Text className="text-muted text-xs mt-1" style={{ color: colors.textMuted }}>Add your first delivery address to get started.</Text>
             </View>
           }
         />
@@ -123,7 +124,7 @@ export default function AddressListScreen() {
       <Pressable
         onPress={() => router.push('/address/add')}
         className="absolute bottom-5 right-5 w-14 h-14 rounded-full items-center justify-center active:opacity-80"
-        style={{ backgroundColor: colors.primary, elevation: 6, shadowColor: '#12B76A', shadowOpacity: 0.3, shadowRadius: 10 }}
+        style={{ backgroundColor: colors.primary, elevation: 6, shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 10 }}
       >
         <Plus size={24} color="#fff" />
       </Pressable>

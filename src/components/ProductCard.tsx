@@ -24,7 +24,7 @@ import {
 import { Image } from 'expo-image';
 import { Star, Plus, Heart, Minus, Clock, ChevronRight } from 'lucide-react-native';
 import type { Product, Store } from '@/lib/types';
-import { colors } from '@/theme/colors';
+import { useThemeColors, useIsDark } from '@/store/theme';
 import {
   formatCurrency,
   formatDiscountPercent,
@@ -71,10 +71,12 @@ function discountTagFor(product: Product): { label: string; bg: string; fg: stri
 }
 
 /** Visual hint based on whether this is a prepared meal or packaged item. */
-function productVisual(product: Product): { light: string; emoji: string } {
+function productVisual(product: Product, isDark: boolean): { light: string; emoji: string } {
   const isFood = !product.brand && product.prep_time_minutes !== undefined;
   return {
-    light: isFood ? '#FEF3C7' : '#ECFDF3',
+    light: isFood
+      ? (isDark ? '#3A2A0A' : '#FEF3C7')
+      : (isDark ? '#0B3A24' : '#ECFDF3'),
     emoji: isFood ? '🍽️' : '🛒'
   };
 }
@@ -87,6 +89,8 @@ export function ProductCard({
   deliveryMinutes
 }: Props) {
   const router = useRouter();
+  const colors = useThemeColors();
+  const isDark = useIsDark();
   const addItem = useCartStore((s) => s.addItem);
   const increment = useCartStore((s) => s.increment);
   const decrement = useCartStore((s) => s.decrement);
@@ -116,7 +120,7 @@ export function ProductCard({
 
   const effPrice = effectivePrice(product.price, product.discount_price);
   const discountPct = formatDiscountPercent(product.price, product.discount_price);
-  const { light, emoji } = productVisual(product);
+  const { light, emoji } = productVisual(product, isDark);
   const tag = discountTagFor(product);
   const qty = cartItem?.quantity || 0;
   const deliveryMins = deliveryMinutes ?? store?.delivery_time_minutes ?? 8;
@@ -169,7 +173,7 @@ export function ProductCard({
   return (
     <Pressable
       onPress={() => router.push(`/product/${product.id}`)}
-      style={[styles.card, { width: cardWidth as any }]}
+      style={[styles.card, { width: cardWidth as any, backgroundColor: colors.background, borderColor: colors.border }]}
       android_ripple={{ color: 'rgba(0,0,0,0.04)', radius: 200 }}
     >
       {/* Image area */}
@@ -180,6 +184,7 @@ export function ProductCard({
               source={typeof images[0] === 'string' ? { uri: images[0] } : images[0]}
               style={styles.image}
               contentFit="cover"
+              transition={150}
             />
           ) : (
             <Text style={styles.imageEmoji}>{emoji}</Text>
@@ -211,6 +216,7 @@ export function ProductCard({
             style={[
               styles.vegDot,
               {
+                backgroundColor: colors.background,
                 borderColor: product.is_veg ? colors.success : colors.error
               }
             ]}
@@ -230,12 +236,12 @@ export function ProductCard({
         <Pressable
           onPress={onHeart}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          style={styles.heartBtn}
+          style={[styles.heartBtn, { backgroundColor: colors.background }]}
         >
           <Animated.View style={{ transform: [{ scale: heartScale }] }}>
             <Heart
               size={16}
-              color={isFav ? colors.error : '#667085'}
+              color={isFav ? colors.error : colors.textMuted}
               fill={isFav ? colors.error : 'transparent'}
               strokeWidth={2.2}
             />
@@ -244,7 +250,7 @@ export function ProductCard({
 
         {/* Discount badge floating on the image bottom-left */}
         {discountPct > 0 && (
-          <View style={styles.discountBadge}>
+          <View style={[styles.discountBadge, { backgroundColor: colors.primary }]}>
             <Text style={styles.discountBadgeText}>{discountPct}% OFF</Text>
           </View>
         )}
@@ -253,34 +259,34 @@ export function ProductCard({
       {/* Body */}
       <View style={styles.body}>
         {/* Weight chip */}
-        <View style={styles.weightChip}>
-          <Text style={styles.weightText}>{product.unit}</Text>
+        <View style={[styles.weightChip, { backgroundColor: colors.surfaceAlt }]}>
+          <Text style={[styles.weightText, { color: colors.textMuted }]}>{product.unit}</Text>
         </View>
 
         {/* Brand + name */}
         {product.brand ? (
-          <Text style={styles.brand} numberOfLines={1}>
+          <Text style={[styles.brand, { color: colors.textMuted }]} numberOfLines={1}>
             {product.brand}
           </Text>
         ) : null}
-        <Text style={styles.name} numberOfLines={2}>
+        <Text style={[styles.name, { color: colors.text }]} numberOfLines={2}>
           {product.name}
         </Text>
 
         {/* Rating + delivery */}
         <View style={styles.metaRow}>
-          <View style={styles.ratingPill}>
+          <View style={[styles.ratingPill, { backgroundColor: colors.success }]}>
             <Star size={10} color="#fff" fill="#fff" />
             <Text style={styles.ratingText}>
               {product.rating.toFixed(1)}
             </Text>
           </View>
-          <Text style={styles.metaSub}>
+          <Text style={[styles.metaSub, { color: colors.textMuted }]}>
             ({formatIndianCount(product.reviews_count)})
           </Text>
           <View style={styles.delivery}>
             <Clock size={10} color={colors.textMuted} />
-            <Text style={styles.deliveryText}>
+            <Text style={[styles.deliveryText, { color: colors.textMuted }]}>
               {formatDeliveryTime(deliveryMins)}
             </Text>
           </View>
@@ -290,9 +296,9 @@ export function ProductCard({
         <View style={styles.priceRow}>
           <View style={{ flex: 1, marginRight: 8 }}>
             <View style={styles.priceLine}>
-              <Text style={styles.price}>{formatCurrency(effPrice)}</Text>
+              <Text style={[styles.price, { color: colors.text }]}>{formatCurrency(effPrice)}</Text>
               {product.discount_price ? (
-                <Text style={styles.mrp}>
+                <Text style={[styles.mrp, { color: colors.textMuted }]}>
                   {formatCurrency(product.price)}
                 </Text>
               ) : null}
@@ -314,24 +320,30 @@ export function ProductCard({
                 disabled={!store || adding}
                 style={[
                   styles.addBtn,
-                  (!store || adding) && { borderColor: colors.border, opacity: 0.55 }
+                  {
+                    borderColor: (!store || adding) ? colors.border : colors.primary,
+                    backgroundColor: colors.background,
+                    opacity: (!store || adding) ? 0.55 : 1
+                  }
                 ]}
               >
                 <Text
                   style={[
                     styles.addBtnText,
-                    (!store || adding) && { color: colors.textMuted }
+                    {
+                      color: (!store || adding) ? colors.textMuted : colors.primary
+                    }
                   ]}
                 >
                   {adding ? 'ADDED' : 'ADD'}
                 </Text>
               </Pressable>
             ) : (
-              <View style={styles.stepper}>
+              <View style={[styles.stepper, { backgroundColor: colors.primaryLight }]}>
                 <Pressable onPress={onDecrement} style={styles.stepBtn}>
                   <Minus size={14} color={colors.primary} strokeWidth={3} />
                 </Pressable>
-                <Text style={styles.qty}>{qty}</Text>
+                <Text style={[styles.qty, { color: colors.primary }]}>{qty}</Text>
                 <Pressable onPress={onIncrement} style={styles.stepBtn}>
                   <Plus size={14} color="#fff" strokeWidth={3} />
                 </Pressable>
@@ -342,16 +354,16 @@ export function ProductCard({
 
         {/* Options text — when product has multiple tags we treat as "variants" */}
         {product.tags && product.tags.length > 2 && (
-          <Text style={styles.options}>2 options ›</Text>
+          <Text style={[styles.options, { color: colors.primary }]}>2 options ›</Text>
         )}
 
         {/* See more like this */}
         {!hideSeeMore && (
           <Pressable
             onPress={() => router.push(`/search?q=${encodeURIComponent(product.name.split(' ')[0])}`)}
-            style={styles.seeMore}
+            style={[styles.seeMore, { backgroundColor: colors.primary50 }]}
           >
-            <Text style={styles.seeMoreText}>See more like this</Text>
+            <Text style={[styles.seeMoreText, { color: colors.primary }]}>See more like this</Text>
             <ChevronRight size={11} color={colors.primary} strokeWidth={2.5} />
           </Pressable>
         )}
@@ -364,13 +376,11 @@ const CARD_RADIUS = 14;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
     borderRadius: CARD_RADIUS,
     borderWidth: 1,
-    borderColor: colors.border,
     overflow: 'hidden',
     marginBottom: 10,
-    shadowColor: '#0F172A',
+    shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
@@ -420,7 +430,6 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 3,
-    backgroundColor: '#fff',
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center'
@@ -432,7 +441,6 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -445,7 +453,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 12,
     left: 12,
-    backgroundColor: colors.primary,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4
@@ -462,7 +469,6 @@ const styles = StyleSheet.create({
   },
   weightChip: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.surfaceAlt,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
@@ -470,19 +476,16 @@ const styles = StyleSheet.create({
   },
   weightText: {
     fontSize: 10,
-    color: colors.textMuted,
     fontWeight: '600'
   },
   brand: {
     fontSize: 9,
-    color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
     marginBottom: 1
   },
   name: {
     fontSize: 13,
-    color: colors.text,
     fontWeight: '600',
     lineHeight: 16,
     minHeight: 32
@@ -496,7 +499,6 @@ const styles = StyleSheet.create({
   ratingPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.success,
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 4,
@@ -508,8 +510,7 @@ const styles = StyleSheet.create({
     fontWeight: '800'
   },
   metaSub: {
-    fontSize: 9,
-    color: colors.textMuted
+    fontSize: 9
   },
   delivery: {
     flexDirection: 'row',
@@ -519,7 +520,6 @@ const styles = StyleSheet.create({
   },
   deliveryText: {
     fontSize: 9,
-    color: colors.textMuted,
     fontWeight: '500'
   },
   priceRow: {
@@ -535,13 +535,11 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 16,
-    color: colors.text,
     fontWeight: '800',
     letterSpacing: -0.2
   },
   mrp: {
     fontSize: 11,
-    color: colors.textMuted,
     textDecorationLine: 'line-through'
   },
   tag: {
@@ -563,12 +561,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 8,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    backgroundColor: '#fff'
+    borderWidth: 1.5
   },
   addBtnText: {
-    color: colors.primary,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.8
@@ -576,7 +571,6 @@ const styles = StyleSheet.create({
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primaryLight,
     borderRadius: 8,
     overflow: 'hidden'
   },
@@ -589,13 +583,11 @@ const styles = StyleSheet.create({
   qty: {
     minWidth: 24,
     textAlign: 'center',
-    color: colors.primary,
     fontWeight: '800',
     fontSize: 13
   },
   options: {
     fontSize: 10,
-    color: colors.primary,
     fontWeight: '600',
     marginTop: 6,
     marginLeft: 2
@@ -606,13 +598,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 8,
     paddingVertical: 4,
-    backgroundColor: colors.primary50,
     borderRadius: 6,
     gap: 2
   },
   seeMoreText: {
     fontSize: 10,
-    color: colors.primary,
     fontWeight: '700'
   }
 });

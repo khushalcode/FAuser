@@ -14,7 +14,7 @@ import { View, Pressable, Text, StyleSheet, Platform, Keyboard } from 'react-nat
 import { Home, LayoutGrid, ShoppingCart, ClipboardList, User } from 'lucide-react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 type TabKey = 'home' | 'categories' | 'cart' | 'orders' | 'profile';
 
@@ -57,6 +57,7 @@ export function BottomNav({ cartCount = 0, activeOrders = 0 }: Props) {
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const [keyboardOpen, setKeyboardOpen] = React.useState(false);
+  const colors = useThemeColors();
 
   React.useEffect(() => {
     const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -79,11 +80,12 @@ export function BottomNav({ cartCount = 0, activeOrders = 0 }: Props) {
   };
 
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8), backgroundColor: colors.background, borderTopColor: colors.borderLight }]}
+    >
       {TABS.map(({ key, label, route, Icon }) => {
         const active = current === key;
         const badge = key === 'cart' ? cartCount : key === 'orders' ? activeOrders : 0;
-        const color = active ? colors.primary700 : colors.textMuted;
+        const color = active ? colors.primary : colors.textMuted;
         return (
           <Pressable
             key={key}
@@ -93,15 +95,15 @@ export function BottomNav({ cartCount = 0, activeOrders = 0 }: Props) {
             accessibilityState={{ selected: active }}
             accessibilityLabel={label}
           >
-            <View style={[styles.iconPill, active && styles.iconPillActive]}>
+            <View style={[styles.iconPill, active && { backgroundColor: colors.primaryLight }]}>
               <Icon
                 size={21}
                 color={color}
                 strokeWidth={active ? 2.4 : 2}
-                fill={active ? colors.primary200 : 'transparent'}
+                fill={active ? colors.primaryLight : 'transparent'}
               />
               {badge > 0 ? (
-                <View style={styles.badge}>
+                <View style={[styles.badge, { borderColor: colors.background }]}>
                   <Text style={styles.badgeText}>{badge > 99 ? '99+' : badge}</Text>
                 </View>
               ) : null}
@@ -119,13 +121,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
     paddingTop: 8,
     paddingHorizontal: 6,
     borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    shadowColor: '#101828',
-    shadowOpacity: 0.06,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: -4 },
     elevation: 16
@@ -143,9 +143,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative'
   },
-  iconPillActive: {
-    backgroundColor: colors.primary100
-  },
   label: {
     fontSize: 11,
     marginTop: 3,
@@ -159,9 +156,7 @@ const styles = StyleSheet.create({
     height: 17,
     paddingHorizontal: 4,
     borderRadius: 9,
-    backgroundColor: colors.error,
     borderWidth: 1.5,
-    borderColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center'
   },

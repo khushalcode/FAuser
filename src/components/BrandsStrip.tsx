@@ -1,10 +1,12 @@
 /**
  * BrandsStrip — horizontal scrolling row of brand logos (Blinkit-style).
  * Each brand shows: colored circle + brand name + offer badge.
+ *
+ * Dark-mode aware — surfaces, text, and the white brand-circle border adapt.
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 export interface BrandItem {
   id: string;
@@ -31,15 +33,18 @@ interface Props {
 }
 
 export function BrandsStrip({ brands = DEFAULT_BRANDS, onPress }: Props) {
+  const colors = useThemeColors();
   return (
     <View style={styles.wrap}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>🏛️ Top Brands</Text>
-          <Text style={styles.subtitle}>Shop from your favourite brands</Text>
+          <Text style={[styles.title, { color: colors.text }]}>🏛️ Top Brands</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+            Shop from your favourite brands
+          </Text>
         </View>
         <Pressable onPress={() => onPress?.(brands[0])}>
-          <Text style={styles.seeAll}>See all →</Text>
+          <Text style={[styles.seeAll, { color: colors.primary }]}>See all →</Text>
         </Pressable>
       </View>
       <ScrollView
@@ -53,10 +58,20 @@ export function BrandsStrip({ brands = DEFAULT_BRANDS, onPress }: Props) {
             onPress={() => onPress?.(b)}
             style={styles.brandCard}
           >
-            <View style={[styles.brandCircle, { backgroundColor: b.color + '22' }]}>
+            <View
+              style={[
+                styles.brandCircle,
+                {
+                  backgroundColor: colors.surfaceElevated,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
               <Text style={styles.brandEmoji}>{b.emoji}</Text>
             </View>
-            <Text style={styles.brandName} numberOfLines={1}>{b.name}</Text>
+            <Text style={[styles.brandName, { color: colors.text }]} numberOfLines={1}>
+              {b.name}
+            </Text>
             {b.offer && (
               <View style={[styles.offerBadge, { backgroundColor: b.color }]}>
                 <Text style={styles.offerText}>{b.offer}</Text>
@@ -78,9 +93,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 10,
   },
-  title: { fontSize: 16, fontWeight: '700', color: colors.text },
-  subtitle: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
-  seeAll: { fontSize: 12, fontWeight: '600', color: colors.primary },
+  title: { fontSize: 16, fontWeight: '700' },
+  subtitle: { fontSize: 12, marginTop: 2 },
+  seeAll: { fontSize: 12, fontWeight: '600' },
   scroll: { paddingHorizontal: 16, paddingBottom: 8 },
   brandCard: {
     alignItems: 'center',
@@ -94,7 +109,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#fff',
     shadowColor: '#000',
     shadowOpacity: 0.06,
     shadowRadius: 6,
@@ -106,7 +120,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 11,
     fontWeight: '600',
-    color: colors.text,
     textAlign: 'center',
   },
   offerBadge: {

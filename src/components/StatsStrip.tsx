@@ -1,10 +1,12 @@
 /**
  * StatsStrip — small horizontal strip showing app-wide stats.
  * "4.6★ rated · 2M+ orders · 15 min avg delivery"
+ *
+ * Dark-mode aware — card surface, border, text colours all adapt.
  */
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 
 interface Props {
   stats?: { label: string; value: string; emoji?: string }[];
@@ -18,16 +20,27 @@ const DEFAULT_STATS = [
 ];
 
 export function StatsStrip({ stats = DEFAULT_STATS }: Props) {
+  const colors = useThemeColors();
   return (
-    <View style={styles.wrap}>
+    <View
+      style={[
+        styles.wrap,
+        {
+          backgroundColor: colors.surfaceElevated,
+          borderColor: colors.borderLight,
+        },
+      ]}
+    >
       {stats.map((s, i) => (
         <React.Fragment key={i}>
           <View style={styles.cell}>
             <Text style={styles.emoji}>{s.emoji}</Text>
-            <Text style={styles.value}>{s.value}</Text>
-            <Text style={styles.label}>{s.label}</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{s.value}</Text>
+            <Text style={[styles.label, { color: colors.textMuted }]}>{s.label}</Text>
           </View>
-          {i < stats.length - 1 && <View style={styles.divider} />}
+          {i < stats.length - 1 && (
+            <View style={[styles.divider, { backgroundColor: colors.borderLight }]} />
+          )}
         </React.Fragment>
       ))}
     </View>
@@ -38,12 +51,10 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     marginHorizontal: 16,
     borderRadius: 14,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: colors.borderLight,
     shadowColor: '#000',
     shadowOpacity: 0.04,
     shadowRadius: 6,
@@ -59,18 +70,15 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 13,
     fontWeight: '800',
-    color: colors.text,
   },
   label: {
     fontSize: 9,
-    color: colors.textMuted,
     marginTop: 1,
     fontWeight: '500',
   },
   divider: {
     width: 1,
     height: 24,
-    backgroundColor: colors.borderLight,
   },
 });
 

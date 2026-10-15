@@ -40,7 +40,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronUp, ChevronRight } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { Image } from 'expo-image';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import type { Product, Category, Store } from '@/lib/types';
 import type {
@@ -73,6 +74,10 @@ import { CashbackBanner } from '@/components/CashbackBanner';
 import { QuickActionsGrid } from '@/components/QuickActionsGrid';
 import { RecentlyViewedStrip } from '@/components/RecentlyViewedStrip';
 import { AppFooter } from '@/components/AppFooter';
+import { LiveDeliveryTracker } from '@/components/LiveDeliveryTracker';
+import { PromoCodeStrip } from '@/components/PromoCodeStrip';
+import { TrendingRecipes } from '@/components/TrendingRecipes';
+import { DeliveryPromiseBanner } from '@/components/DeliveryPromiseBanner';
 import { getProductImage } from '@/utils/images';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -104,6 +109,7 @@ const TAB_ACCENTS: Record<string, string> = {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const scrollRef = React.useRef<any>(null);
 
@@ -281,7 +287,7 @@ export default function HomeScreen() {
   });
 
   return (
-    <View style={styles.flex}>
+    <View style={[styles.flex, { backgroundColor: colors.background }]}>
       <View style={styles.flex}>
         <Animated.ScrollView
           ref={scrollRef as any}
@@ -306,6 +312,11 @@ export default function HomeScreen() {
             ) : (
               <SkeletonShimmer width="100%" height={140} radius={16} />
             )}
+          </Animated.View>
+
+          {/* NEW: Delivery Promise Banner (8-min delivery highlight) */}
+          <Animated.View style={fadeOpacity(1)}>
+            <DeliveryPromiseBanner />
           </Animated.View>
 
           {/* NEW: Live Order Banner */}
@@ -335,6 +346,11 @@ export default function HomeScreen() {
             <View style={{ marginTop: 14 }}>
               <StatsStrip />
             </View>
+          </Animated.View>
+
+          {/* NEW: Live Delivery Tracker (animated route) */}
+          <Animated.View style={fadeOpacity(3)}>
+            <LiveDeliveryTracker />
           </Animated.View>
 
           {/* NEW: Offers Strip */}
@@ -406,6 +422,11 @@ export default function HomeScreen() {
                 onPress={(s) => router.push(`/store/${s.id}`)}
               />
             )}
+          </Animated.View>
+
+          {/* NEW: Trending Recipes — cook tonight's dinner */}
+          <Animated.View style={fadeOpacity(7)}>
+            <TrendingRecipes />
           </Animated.View>
 
           {/* Section 8: Featured This Week — blue-bordered carousel */}
@@ -487,6 +508,11 @@ export default function HomeScreen() {
                 }
               />
             )}
+          </Animated.View>
+
+          {/* NEW: Active Coupons Strip */}
+          <Animated.View style={fadeOpacity(11)}>
+            <PromoCodeStrip />
           </Animated.View>
 
           {/* Section 12: Product Grid — Stock up on crunchy snacks */}
@@ -597,9 +623,9 @@ export default function HomeScreen() {
             }
           ]}
         >
-          <Pressable onPress={scrollToTop} style={styles.backToTopBtn}>
-            <ChevronUp size={14} color="#fff" strokeWidth={3} />
-            <Text style={styles.backToTopText}>Top</Text>
+          <Pressable onPress={scrollToTop} style={[styles.backToTopBtn, { backgroundColor: colors.surfaceElevated }]}>
+            <ChevronUp size={14} color={colors.text} strokeWidth={3} />
+            <Text style={[styles.backToTopText, { color: colors.text }]}>Top</Text>
           </Pressable>
         </Animated.View>
 
@@ -612,6 +638,15 @@ export default function HomeScreen() {
 
 // -------- Hero Carousel --------
 // Auto-rotating promotional carousel with dot indicators.
+
+// Map tab key → local banner image
+const HERO_BANNER_IMAGES: Record<string, any> = {
+  all: require('../../assets/images/banners/banner1.jpg'),
+  restaurants: require('../../assets/images/banners/banner3.jpg'),
+  grocery: require('../../assets/images/banners/banner2.jpg'),
+  sweets: require('../../assets/images/food/sweets.jpg'),
+  bakery: require('../../assets/images/food/bakery.jpg'),
+};
 
 function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
   const router = useRouter();
@@ -643,6 +678,7 @@ function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
   const banner = banners[idx] || banners[0];
   if (!banner) return null;
   const [c1, c2] = banner.gradient;
+  const heroImage = HERO_BANNER_IMAGES[banner.tab] || HERO_BANNER_IMAGES.all;
 
   return (
     <View style={styles.heroSection}>
@@ -661,6 +697,18 @@ function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
           }
         ]}
       >
+        {/* Real food image as background (right side) */}
+        <View style={styles.heroImageWrap}>
+          <Image
+            source={heroImage}
+            style={styles.heroImage}
+            contentFit="cover"
+            transition={300}
+          />
+          {/* Gradient scrim over image for text legibility */}
+          <View style={[styles.heroImageScrim, { backgroundColor: c2 }]} />
+        </View>
+
         {/* Decorative overlay tint */}
         <View style={[styles.heroOverlay, { backgroundColor: c2, opacity: 0.55 }]} />
 
@@ -673,16 +721,24 @@ function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
               {banner.subtitle}
             </Text>
             <View style={styles.heroCta}>
-              <Text style={styles.heroCtaText}>{banner.ctaText}</Text>
+              <Text style={[styles.heroCtaText, { color: '#101828' }]}>{banner.ctaText}</Text>
               <ChevronRight
                 size={12}
-                color={colors.text}
+                color="#101828"
                 strokeWidth={3}
                 style={{ marginLeft: 2 }}
               />
             </View>
           </View>
-          <Text style={styles.heroEmoji}>{banner.heroEmoji}</Text>
+          {/* Real circular food image instead of emoji */}
+          <View style={styles.heroImageCircle}>
+            <Image
+              source={heroImage}
+              style={styles.heroCircleImg}
+              contentFit="cover"
+              transition={200}
+            />
+          </View>
         </Animated.View>
 
         {/* Dot indicators (only when multiple banners) */}
@@ -712,8 +768,7 @@ function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
 
 const styles = StyleSheet.create({
   flex: {
-    flex: 1,
-    backgroundColor: '#fff'
+    flex: 1
   },
   heroWrap: {
     marginTop: 8
@@ -764,13 +819,52 @@ const styles = StyleSheet.create({
   },
   heroCtaText: {
     fontSize: 12,
-    color: colors.text,
     fontWeight: '800',
     letterSpacing: 0.3
   },
   heroEmoji: {
     fontSize: 64,
     marginLeft: 8
+  },
+  heroImageWrap: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: '45%',
+    borderTopLeftRadius: 100,
+    borderBottomLeftRadius: 100,
+    overflow: 'hidden',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroImageScrim: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    opacity: 0.35,
+  },
+  heroImageCircle: {
+    width: 78,
+    height: 78,
+    borderRadius: 39,
+    marginLeft: 8,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.85)',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
+  },
+  heroCircleImg: {
+    width: '100%',
+    height: '100%',
   },
   heroDots: {
     position: 'absolute',
@@ -813,7 +907,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#1F2937',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
@@ -824,7 +917,6 @@ const styles = StyleSheet.create({
     elevation: 4
   },
   backToTopText: {
-    color: '#fff',
     fontSize: 11,
     fontWeight: '700'
   }

@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, MapPin, Home, Briefcase, MapPinned, Locate, CheckCircle2, Navigation } from 'lucide-react-native';
 import * as Location from 'expo-location';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useUserStore } from '@/store/user';
 import { hapticNotify } from '@/utils/platform';
 import Constants from 'expo-constants';
@@ -42,6 +42,7 @@ const DEFAULT_REGION = {
 
 export default function AddAddressScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const addAddress = useUserStore((s) => s.addAddress);
 
   const [label, setLabel] = React.useState<Label>('Home');
@@ -168,10 +169,10 @@ export default function AddAddressScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <View className="px-5 pt-2 pb-3 flex-row items-center">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3" style={{ backgroundColor: colors.surface, borderColor: colors.borderLight }}>
           <ArrowLeft size={18} color={colors.text} />
         </Pressable>
-        <Text className="text-textmain text-[22px] font-extrabold tracking-tight">Add New Address</Text>
+        <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>Add New Address</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
@@ -211,7 +212,7 @@ export default function AddAddressScreen() {
                       }
                     }}
                   >
-                    <View style={mapStyles.marker}>
+                    <View style={[mapStyles.marker, { backgroundColor: colors.primary, borderColor: '#fff' }]}>
                       <MapPin size={18} color="#fff" />
                     </View>
                   </Marker>
@@ -227,7 +228,7 @@ export default function AddAddressScreen() {
           ) : (
             <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surface }}>
               <MapPin size={36} color={colors.primary} />
-              <Text className="text-muted text-xs mt-2">
+              <Text className="text-muted text-xs mt-2" style={{ color: colors.textMuted }}>
                 {coords.lat ? `Lat: ${coords.lat.toFixed(4)}, Lng: ${coords.lng?.toFixed(4)}` : 'Map available in APK build'}
               </Text>
             </View>
@@ -237,7 +238,7 @@ export default function AddAddressScreen() {
           <Pressable
             onPress={useCurrentLocation}
             disabled={locating}
-            style={mapStyles.fab}
+            style={[mapStyles.fab, { backgroundColor: colors.primary }]}
           >
             {locating ? (
               <ActivityIndicator color="#fff" size={14} />
@@ -253,13 +254,13 @@ export default function AddAddressScreen() {
           {geocoding && (
             <View style={mapStyles.geoChip}>
               <ActivityIndicator size="small" color={colors.primary} />
-              <Text className="text-muted text-[11px] ml-1.5">Updating address…</Text>
+              <Text className="text-muted text-[11px] ml-1.5" style={{ color: colors.textMuted }}>Updating address…</Text>
             </View>
           )}
         </View>
 
         {/* Label */}
-        <Text className="text-textmain text-sm font-medium mb-1.5">Save as</Text>
+        <Text className="text-textmain text-sm font-medium mb-1.5" style={{ color: colors.text }}>Save as</Text>
         <View className="flex-row mb-4">
           {(['Home', 'Work', 'Other'] as Label[]).map((l) => {
             const Icon = l === 'Home' ? Home : l === 'Work' ? Briefcase : MapPinned;
@@ -283,36 +284,36 @@ export default function AddAddressScreen() {
           })}
         </View>
 
-        <Field label="Full Name">
-          <TextInput value={fullName} onChangeText={setFullName} placeholder="Recipient name" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" />
+        <Field label="Full Name" colors={colors}>
+          <TextInput value={fullName} onChangeText={setFullName} placeholder="Recipient name" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" style={{ color: colors.text }} />
         </Field>
 
-        <Field label="Phone Number">
-          <TextInput value={phone} onChangeText={setPhone} placeholder="+91 98000 00000" placeholderTextColor={colors.textMuted} keyboardType="phone-pad" className="flex-1 ml-2.5 text-sm text-textmain" />
+        <Field label="Phone Number" colors={colors}>
+          <TextInput value={phone} onChangeText={setPhone} placeholder="+91 98000 00000" placeholderTextColor={colors.textMuted} keyboardType="phone-pad" className="flex-1 ml-2.5 text-sm text-textmain" style={{ color: colors.text }} />
         </Field>
 
-        <Field label="Address Line 1 (House / Flat)">
-          <TextInput value={line1} onChangeText={setLine1} placeholder="Flat 402, Prestige Towers" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" />
+        <Field label="Address Line 1 (House / Flat)" colors={colors}>
+          <TextInput value={line1} onChangeText={setLine1} placeholder="Flat 402, Prestige Towers" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" style={{ color: colors.text }} />
         </Field>
 
-        <Field label="Address Line 2 (Street / Area)" optional>
-          <TextInput value={line2} onChangeText={setLine2} placeholder="MG Road" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" />
+        <Field label="Address Line 2 (Street / Area)" optional colors={colors}>
+          <TextInput value={line2} onChangeText={setLine2} placeholder="MG Road" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" style={{ color: colors.text }} />
         </Field>
 
         <View className="flex-row mb-4">
           <View className="flex-1 mr-2">
-            <Field label="City">
-              <TextInput value={city} onChangeText={setCity} placeholder="Bangalore" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" />
+            <Field label="City" colors={colors}>
+              <TextInput value={city} onChangeText={setCity} placeholder="Bangalore" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" style={{ color: colors.text }} />
             </Field>
           </View>
           <View className="flex-1 ml-2">
-            <Field label="State">
-              <TextInput value={state} onChangeText={setState} placeholder="Karnataka" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" />
+            <Field label="State" colors={colors}>
+              <TextInput value={state} onChangeText={setState} placeholder="Karnataka" placeholderTextColor={colors.textMuted} className="flex-1 ml-2.5 text-sm text-textmain" style={{ color: colors.text }} />
             </Field>
           </View>
         </View>
 
-        <Field label="Pincode">
+        <Field label="Pincode" colors={colors}>
           <TextInput
             value={pincode}
             onChangeText={(v) => {
@@ -324,6 +325,7 @@ export default function AddAddressScreen() {
             keyboardType="numeric"
             maxLength={6}
             className="flex-1 ml-2.5 text-sm text-textmain"
+            style={{ color: colors.text }}
           />
         </Field>
 
@@ -337,7 +339,7 @@ export default function AddAddressScreen() {
           >
             {isDefault && <CheckCircle2 size={13} color="#fff" />}
           </View>
-          <Text className="text-textmain text-sm">Set as default address</Text>
+          <Text className="text-textmain text-sm" style={{ color: colors.text }}>Set as default address</Text>
         </Pressable>
 
         <Pressable
@@ -357,13 +359,13 @@ export default function AddAddressScreen() {
   );
 }
 
-function Field({ label, optional, children }: { label: string; optional?: boolean; children: React.ReactNode }) {
+function Field({ label, optional, colors, children }: { label: string; optional?: boolean; colors: any; children: React.ReactNode }) {
   return (
     <View className="mb-4">
-      <Text className="text-textmain text-sm font-medium mb-1.5">
-        {label} {optional && <Text className="text-muted text-xs">(optional)</Text>}
+      <Text className="text-textmain text-sm font-medium mb-1.5" style={{ color: colors.text }}>
+        {label} {optional && <Text className="text-muted text-xs" style={{ color: colors.textMuted }}>(optional)</Text>}
       </Text>
-      <View className="flex-row items-center bg-surface rounded-xl2 px-3.5 py-3 border border-line">
+      <View className="flex-row items-center bg-surface rounded-xl2 px-3.5 py-3 border border-line" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
         {children}
       </View>
     </View>
@@ -375,11 +377,9 @@ const mapStyles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: '#fff'
+    borderWidth: 3
   },
   fab: {
     position: 'absolute',
@@ -390,8 +390,7 @@ const mapStyles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 22,
-    backgroundColor: colors.primary,
-    shadowColor: '#0F172A',
+    shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },

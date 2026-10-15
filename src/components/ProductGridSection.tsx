@@ -10,7 +10,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import type { Product, Store } from '@/lib/types';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { ProductCard } from './ProductCard';
 import { SkeletonShimmer } from './SkeletonShimmer';
 import { useRouter } from 'expo-router';
@@ -40,20 +40,21 @@ export function ProductGridSection({
   isLoading = false
 }: Props) {
   const router = useRouter();
+  const colors = useThemeColors();
   const items = products.slice(0, limit);
 
   return (
     <View style={styles.section}>
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
             {emoji ? `${emoji}  ` : ''}{title}
           </Text>
-          {subtitle ? <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text> : null}
+          {subtitle ? <Text style={[styles.subtitle, { color: colors.textMuted }]} numberOfLines={1}>{subtitle}</Text> : null}
         </View>
         {onSeeAll && (
           <Pressable onPress={onSeeAll} style={styles.seeAll}>
-            <Text style={styles.seeAllText}>See all</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>See all</Text>
             <ChevronRight size={13} color={colors.primary} strokeWidth={2.5} />
           </Pressable>
         )}
@@ -62,7 +63,7 @@ export function ProductGridSection({
       {isLoading ? (
         <View style={styles.grid}>
           {Array.from({ length: 4 }).map((_, i) => (
-            <View key={i} style={styles.skeletonCard}>
+            <View key={i} style={[styles.skeletonCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
               <SkeletonShimmer width="100%" height={120} radius={12} />
               <SkeletonShimmer width="60%" height={10} style={{ marginTop: 8 }} />
               <SkeletonShimmer width="100%" height={10} style={{ marginTop: 6 }} />
@@ -100,13 +101,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '900',
-    color: colors.text,
     letterSpacing: -0.4,
     lineHeight: 22
   },
   subtitle: {
     fontSize: 12,
-    color: colors.textMuted,
     marginTop: 2
   },
   seeAll: {
@@ -115,7 +114,6 @@ const styles = StyleSheet.create({
     paddingBottom: 2
   },
   seeAllText: {
-    color: colors.primary,
     fontSize: 13,
     fontWeight: '700'
   },
@@ -130,12 +128,10 @@ const styles = StyleSheet.create({
   },
   skeletonCard: {
     width: (SCREEN_WIDTH - H_PAD * 2 - GAP) / 2,
-    backgroundColor: '#fff',
     borderRadius: 14,
     padding: 12,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: colors.border
+    borderWidth: 1
   }
 });
 

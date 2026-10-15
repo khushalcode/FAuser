@@ -5,7 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Package, ChevronRight, RefreshCw, MapPin, Bike, Wifi } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { useCartStore } from '@/store/cart';
@@ -20,6 +20,7 @@ type Tab = 'active' | 'past';
 export default function OrdersScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const colors = useThemeColors();
   const [tab, setTab] = React.useState<Tab>('active');
   const [orders, setOrders] = React.useState<Order[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -101,8 +102,8 @@ export default function OrdersScreen() {
       <View className="px-5 pt-2 pb-3">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-textmain text-[22px] font-extrabold tracking-tight">My Orders</Text>
-            <Text className="text-muted text-sm mt-0.5">Track and manage your orders</Text>
+            <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>My Orders</Text>
+            <Text className="text-muted text-sm mt-0.5" style={{ color: colors.textMuted }}>Track and manage your orders</Text>
           </View>
           {isSupabaseConfigured && (
             <View className="flex-row items-center px-2 py-1 rounded-md" style={{ backgroundColor: live ? colors.successLight : colors.surfaceAlt }}>
@@ -117,13 +118,13 @@ export default function OrdersScreen() {
 
       {/* Tabs */}
       <View className="px-5 mb-2">
-        <View className="flex-row bg-surface rounded-xl2 p-1 border border-line">
+        <View className="flex-row bg-surface rounded-xl2 p-1 border border-line" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
           {(['active', 'past'] as Tab[]).map((t) => (
             <Pressable
               key={t}
               onPress={() => setTab(t)}
               className="flex-1 py-2.5 rounded-xl items-center"
-              style={{ backgroundColor: tab === t ? '#fff' : 'transparent', elevation: tab === t ? 2 : 0, shadowColor: '#0F172A', shadowOpacity: tab === t ? 0.08 : 0, shadowRadius: 4 }}
+              style={{ backgroundColor: tab === t ? colors.surfaceElevated : 'transparent', elevation: tab === t ? 2 : 0, shadowColor: '#000', shadowOpacity: tab === t ? 0.08 : 0, shadowRadius: 4 }}
             >
               <Text
                 className="text-sm font-semibold"
@@ -148,10 +149,10 @@ export default function OrdersScreen() {
           >
             <Package size={36} color={colors.textMuted} />
           </View>
-          <Text className="text-textmain font-bold text-base">
+          <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>
             {tab === 'active' ? 'No active orders' : 'No past orders'}
           </Text>
-          <Text className="text-muted text-sm mt-1 text-center">
+          <Text className="text-muted text-sm mt-1 text-center" style={{ color: colors.textMuted }}>
             {tab === 'active'
               ? 'Your active orders will appear here once you place them.'
               : 'Your past orders will appear here after delivery.'}
@@ -175,7 +176,7 @@ export default function OrdersScreen() {
             <Pressable
               onPress={() => router.push(`/order/${item.id}`)}
               className="bg-white rounded-xl2 border border-line p-4 active:opacity-80"
-              style={{ shadowColor: '#0F172A', shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
+              style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
             >
               <View className="flex-row items-center justify-between mb-2.5">
                 <View className="flex-row items-center flex-1">
@@ -186,43 +187,44 @@ export default function OrdersScreen() {
                     <Text className="text-xl">🛍️</Text>
                   </View>
                   <View className="flex-1">
-                    <Text className="text-textmain font-semibold text-sm" numberOfLines={1}>{item.store_name}</Text>
-                    <Text className="text-muted text-[11px]">#{item.order_code} • {formatDate(item.created_at, true)}</Text>
+                    <Text className="text-textmain font-semibold text-sm" style={{ color: colors.text }} numberOfLines={1}>{item.store_name}</Text>
+                    <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>#{item.order_code} • {formatDate(item.created_at, true)}</Text>
                   </View>
                 </View>
                 <OrderStatusBadge status={item.status} size="sm" />
               </View>
 
-              <Text className="text-muted text-xs" numberOfLines={1}>
+              <Text className="text-muted text-xs" style={{ color: colors.textMuted }} numberOfLines={1}>
                 {item.items.map((it) => `${it.quantity}× ${it.name}`).join(', ')}
               </Text>
 
               <View className="flex-row items-center mt-2.5">
                 <View className="flex-row items-center mr-3">
                   <Bike size={12} color={colors.textMuted} />
-                  <Text className="text-muted text-[11px] ml-0.5">₹{item.delivery_fee} delivery</Text>
+                  <Text className="text-muted text-[11px] ml-0.5" style={{ color: colors.textMuted }}>₹{item.delivery_fee} delivery</Text>
                 </View>
                 <View className="flex-row items-center">
                   <MapPin size={12} color={colors.textMuted} />
-                  <Text className="text-muted text-[11px] ml-0.5">{truncate(item.delivery_address, 25)}</Text>
+                  <Text className="text-muted text-[11px] ml-0.5" style={{ color: colors.textMuted }}>{truncate(item.delivery_address, 25)}</Text>
                 </View>
               </View>
 
-              <View className="h-px bg-line my-3" />
+              <View className="h-px bg-line my-3" style={{ backgroundColor: colors.border }} />
 
               <View className="flex-row items-center justify-between">
                 <View>
-                  <Text className="text-muted text-[11px]">{item.item_count} item{item.item_count > 1 ? 's' : ''}</Text>
-                  <Text className="text-textmain font-bold text-base">{formatCurrency(item.total)}</Text>
+                  <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>{item.item_count} item{item.item_count > 1 ? 's' : ''}</Text>
+                  <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>{formatCurrency(item.total)}</Text>
                 </View>
                 <View className="flex-row">
                   {tab === 'past' && (
                     <Pressable
                       onPress={() => reorder(item)}
                       className="flex-row items-center px-3 py-2 rounded-lg mr-2 border border-line"
+                      style={{ borderColor: colors.border }}
                     >
                       <RefreshCw size={13} color={colors.text} />
-                      <Text className="ml-1 text-textmain text-xs font-semibold">Reorder</Text>
+                      <Text className="ml-1 text-textmain text-xs font-semibold" style={{ color: colors.text }}>Reorder</Text>
                     </Pressable>
                   )}
                   <Pressable
@@ -230,7 +232,7 @@ export default function OrdersScreen() {
                     className="flex-row items-center px-3 py-2 rounded-lg"
                     style={{ backgroundColor: colors.primaryLight }}
                   >
-                    <Text className="text-primary text-xs font-semibold mr-0.5">
+                    <Text className="text-primary text-xs font-semibold mr-0.5" style={{ color: colors.primary }}>
                       {tab === 'active' ? 'Track' : 'Details'}
                     </Text>
                     <ChevronRight size={13} color={colors.primary} />

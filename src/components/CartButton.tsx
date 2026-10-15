@@ -3,12 +3,13 @@ import { View, Text, Pressable, StyleSheet, Platform, Animated, Easing } from 'r
 import { ShoppingCart, ChevronRight } from 'lucide-react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useCartStore } from '@/store/cart';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { formatCurrency } from '@/utils/format';
 
 export function CartButton() {
   const router = useRouter();
   const pathname = usePathname();
+  const colors = useThemeColors();
   const itemCount = useCartStore((s) => s.itemCount());
   const total = useCartStore((s) => s.total());
 
@@ -45,7 +46,11 @@ export function CartButton() {
         onPress={() => router.push('/(tabs)/cart')}
         style={({ pressed }) => [
           styles.button,
-          { opacity: pressed ? 0.92 : 1 }
+          {
+            backgroundColor: colors.primary,
+            shadowColor: colors.primary,
+            opacity: pressed ? 0.92 : 1,
+          },
         ]}
       >
         <View style={styles.countBubble}>
@@ -55,8 +60,8 @@ export function CartButton() {
         <View style={styles.amountWrap}>
           <Text style={styles.amountText}>{formatCurrency(total)}</Text>
         </View>
-        <View style={styles.arrowWrap}>
-          <ChevronRight size={14} color="#12B76A" strokeWidth={3} />
+        <View style={[styles.arrowWrap, { backgroundColor: '#fff' }]}>
+          <ChevronRight size={14} color={colors.primary} strokeWidth={3} />
         </View>
       </Pressable>
     </Animated.View>
@@ -69,14 +74,12 @@ const styles = StyleSheet.create({
     left: 12,
     right: 12,
     bottom: 12,
-    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     elevation: 8,
-    shadowColor: '#12B76A',
     shadowOpacity: 0.4,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -119,7 +122,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },

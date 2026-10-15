@@ -1,9 +1,11 @@
 /**
  * CashbackBanner — promotional banner for wallet cashback offer.
+ *
+ * Uses a fixed purple gradient — kept identical in both light/dark mode
+ * per design spec (colorful banners don't switch).
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { colors } from '@/theme/colors';
 
 interface Props {
   onPress?: () => void;

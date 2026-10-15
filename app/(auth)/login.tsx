@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, Eye, EyeOff, ShoppingBasket, Phone, Wifi, ArrowRight, Shield, Zap, Star } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useAuthStore } from '@/store/auth';
 import { hapticNotify } from '@/utils/platform';
 import { firebaseMode, isFirebaseConfigured } from '@/lib/firebase';
@@ -14,6 +14,7 @@ import { isApiConfigured } from '@/lib/api-client';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const signIn = useAuthStore((s) => s.signInWithEmail);
   const googleSignIn = useAuthStore((s) => s.signInWithGoogle);
   const isLoading = useAuthStore((s) => s.isLoading);
@@ -150,8 +151,8 @@ export default function LoginScreen() {
             style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
             className="px-6 pt-6 flex-1"
           >
-            <Text className="text-textmain text-[22px] font-extrabold tracking-tight">Welcome back 👋</Text>
-            <Text className="text-muted text-sm mt-1">Sign in to continue ordering your favourites.</Text>
+            <Text className="text-textmain text-[22px] font-extrabold tracking-tight" style={{ color: colors.text }}>Welcome back 👋</Text>
+            <Text className="text-muted text-sm mt-1" style={{ color: colors.textMuted }}>Sign in to continue ordering your favourites.</Text>
 
             {/* Demo banner */}
             {!isLiveMode && (
@@ -171,8 +172,8 @@ export default function LoginScreen() {
 
             {/* Email */}
             <View className="mt-5">
-              <Text className="text-textmain text-sm font-medium mb-1.5">Email Address</Text>
-              <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line">
+              <Text className="text-textmain text-sm font-medium mb-1.5" style={{ color: colors.text }}>Email Address</Text>
+              <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
                 <Mail size={18} color={colors.textMuted} />
                 <TextInput
                   value={email}
@@ -182,14 +183,15 @@ export default function LoginScreen() {
                   autoCapitalize="none"
                   keyboardType="email-address"
                   className="flex-1 ml-2.5 text-sm text-textmain"
+                  style={{ color: colors.text }}
                 />
               </View>
             </View>
 
             {/* Password */}
             <View className="mt-4">
-              <Text className="text-textmain text-sm font-medium mb-1.5">Password</Text>
-              <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line">
+              <Text className="text-textmain text-sm font-medium mb-1.5" style={{ color: colors.text }}>Password</Text>
+              <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
                 <Lock size={18} color={colors.textMuted} />
                 <TextInput
                   value={password}
@@ -198,6 +200,7 @@ export default function LoginScreen() {
                   placeholderTextColor={colors.textMuted}
                   secureTextEntry={!showPwd}
                   className="flex-1 ml-2.5 text-sm text-textmain"
+                  style={{ color: colors.text }}
                 />
                 <Pressable onPress={() => setShowPwd(!showPwd)} hitSlop={8}>
                   {showPwd ? <EyeOff size={18} color={colors.textMuted} /> : <Eye size={18} color={colors.textMuted} />}
@@ -208,7 +211,7 @@ export default function LoginScreen() {
             {/* Forgot password */}
             <View className="flex-row justify-end mt-2">
               <Link href="/forgot-password">
-                <Text className="text-primary text-sm font-semibold">Forgot password?</Text>
+                <Text className="text-primary text-sm font-semibold" style={{ color: colors.primary }}>Forgot password?</Text>
               </Link>
             </View>
 
@@ -246,9 +249,9 @@ export default function LoginScreen() {
 
             {/* Divider */}
             <View className="flex-row items-center my-5">
-              <View className="flex-1 h-px bg-line" />
-              <Text className="mx-3 text-muted text-xs font-medium">OR</Text>
-              <View className="flex-1 h-px bg-line" />
+              <View className="flex-1 h-px bg-line" style={{ backgroundColor: colors.borderLight }} />
+              <Text className="mx-3 text-muted text-xs font-medium" style={{ color: colors.textMuted }}>OR</Text>
+              <View className="flex-1 h-px bg-line" style={{ backgroundColor: colors.borderLight }} />
             </View>
 
             {/* Login with OTP */}
@@ -269,7 +272,7 @@ export default function LoginScreen() {
               }]}
             >
               <Phone size={16} color={colors.primary} />
-              <Text className="text-primary font-semibold text-sm ml-2">Login with Phone OTP</Text>
+              <Text className="text-primary font-semibold text-sm ml-2" style={{ color: colors.primary }}>Login with Phone OTP</Text>
             </Pressable>
 
             {/* Google */}
@@ -284,48 +287,48 @@ export default function LoginScreen() {
                 justifyContent: 'center',
                 borderWidth: 1,
                 borderColor: colors.border,
-                backgroundColor: '#fff',
+                backgroundColor: colors.surfaceElevated,
                 opacity: pressed ? 0.8 : 1,
               }]}
             >
               <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginRight: 8 }}>
                 <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#4285F4' }}>G</Text>
               </View>
-              <Text className="text-textmain font-medium text-sm">Sign in with Google</Text>
+              <Text className="text-textmain font-medium text-sm" style={{ color: colors.text }}>Sign in with Google</Text>
             </Pressable>
 
             {/* Register */}
             <View className="flex-row items-center justify-center mt-6">
-              <Text className="text-muted text-sm">Don't have an account? </Text>
+              <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>Don't have an account? </Text>
               <Link href="/register">
-                <Text className="text-primary text-sm font-semibold">Register</Text>
+                <Text className="text-primary text-sm font-semibold" style={{ color: colors.primary }}>Register</Text>
               </Link>
             </View>
 
             {/* Continue as guest */}
             <Pressable onPress={() => router.replace('/(tabs)')} className="items-center mt-3 mb-2">
-              <Text className="text-muted text-xs underline">Continue as guest (browse only)</Text>
+              <Text className="text-muted text-xs underline" style={{ color: colors.textMuted }}>Continue as guest (browse only)</Text>
             </Pressable>
 
             {/* Trust badges */}
-            <View className="flex-row justify-around mt-6 mb-6 px-4 pt-5 border-t border-lineLight">
+            <View className="flex-row justify-around mt-6 mb-6 px-4 pt-5 border-t border-lineLight" style={{ borderTopColor: colors.borderLight }}>
               <View className="items-center">
                 <View className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
                   <Shield size={14} color={colors.primary} />
                 </View>
-                <Text className="text-[10px] text-muted mt-1 font-medium">Secure</Text>
+                <Text className="text-[10px] text-muted mt-1 font-medium" style={{ color: colors.textMuted }}>Secure</Text>
               </View>
               <View className="items-center">
                 <View className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: colors.warningLight }}>
                   <Zap size={14} color={colors.warning} />
                 </View>
-                <Text className="text-[10px] text-muted mt-1 font-medium">Fast</Text>
+                <Text className="text-[10px] text-muted mt-1 font-medium" style={{ color: colors.textMuted }}>Fast</Text>
               </View>
               <View className="items-center">
                 <View className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: colors.infoLight }}>
                   <Star size={14} color={colors.info} />
                 </View>
-                <Text className="text-[10px] text-muted mt-1 font-medium">Verified</Text>
+                <Text className="text-[10px] text-muted mt-1 font-medium" style={{ color: colors.textMuted }}>Verified</Text>
               </View>
             </View>
           </Animated.View>

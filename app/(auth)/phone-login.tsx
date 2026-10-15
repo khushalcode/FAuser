@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { Phone, ChevronLeft, ChevronRight, Shield, Lock } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { useAuthStore } from '@/store/auth';
 import { hapticNotify } from '@/utils/platform';
 
@@ -20,6 +20,7 @@ const COUNTRIES = [
 
 export default function PhoneLoginScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const sendOtp = useAuthStore((s) => s.sendOtp);
   const isLoading = useAuthStore((s) => s.isLoading);
   const clearError = useAuthStore((s) => s.clearError);
@@ -120,14 +121,14 @@ export default function PhoneLoginScreen() {
 
         <Animated.View style={{ opacity: fadeAnim }} className="px-6 pt-6 flex-1">
           {/* Country picker + phone */}
-          <Text className="text-textmain text-sm font-medium mb-1.5">Mobile Number</Text>
-          <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line">
+          <Text className="text-textmain text-sm font-medium mb-1.5" style={{ color: colors.text }}>Mobile Number</Text>
+          <View className="flex-row items-center bg-surface rounded-xl px-3.5 py-3 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
             <Pressable
               onPress={() => setCountryIdx((countryIdx + 1) % COUNTRIES.length)}
               style={{ flexDirection: 'row', alignItems: 'center' }}
             >
               <Text style={{ fontSize: 20 }}>{country.flag}</Text>
-              <Text className="text-textmain text-sm font-semibold ml-1.5 mr-1">{country.code}</Text>
+              <Text className="text-textmain text-sm font-semibold ml-1.5 mr-1" style={{ color: colors.text }}>{country.code}</Text>
               <ChevronRight size={12} color={colors.textMuted} style={{ transform: [{ rotate: '90deg' }] }} />
             </Pressable>
             <View style={{ width: 1, height: 20, backgroundColor: colors.border, marginHorizontal: 8 }} />
@@ -138,10 +139,11 @@ export default function PhoneLoginScreen() {
               placeholderTextColor={colors.textMuted}
               keyboardType="phone-pad"
               className="flex-1 text-sm text-textmain"
+              style={{ color: colors.text }}
               autoFocus
             />
           </View>
-          <Text className="text-muted text-[11px] mt-2">
+          <Text className="text-muted text-[11px] mt-2" style={{ color: colors.textMuted }}>
             We'll send you a 6-digit code via SMS. Standard message rates may apply.
           </Text>
 
@@ -187,7 +189,7 @@ export default function PhoneLoginScreen() {
               borderRadius: 12,
             }}
           >
-            <Text className="text-muted text-xs font-medium">
+            <Text className="text-muted text-xs font-medium" style={{ color: colors.textMuted }}>
               Autofill demo number ({country.code} 98765 43210)
             </Text>
           </Pressable>
@@ -213,9 +215,9 @@ export default function PhoneLoginScreen() {
           </View>
 
           <View className="flex-row items-center justify-center mt-6 mb-8">
-            <Text className="text-muted text-sm">Prefer email? </Text>
+            <Text className="text-muted text-sm" style={{ color: colors.textMuted }}>Prefer email? </Text>
             <Link href="/login">
-              <Text className="text-primary text-sm font-semibold">Sign in with email</Text>
+              <Text className="text-primary text-sm font-semibold" style={{ color: colors.primary }}>Sign in with email</Text>
             </Link>
           </View>
 
@@ -225,19 +227,19 @@ export default function PhoneLoginScreen() {
               <View className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
                 <Shield size={14} color={colors.primary} />
               </View>
-              <Text className="text-[10px] text-muted mt-1 font-medium">Secure</Text>
+              <Text className="text-[10px] text-muted mt-1 font-medium" style={{ color: colors.textMuted }}>Secure</Text>
             </View>
             <View className="items-center">
               <View className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
                 <Lock size={14} color={colors.primary} />
               </View>
-              <Text className="text-[10px] text-muted mt-1 font-medium">Encrypted</Text>
+              <Text className="text-[10px] text-muted mt-1 font-medium" style={{ color: colors.textMuted }}>Encrypted</Text>
             </View>
             <View className="items-center">
               <View className="w-9 h-9 rounded-full items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
                 <Phone size={14} color={colors.primary} />
               </View>
-              <Text className="text-[10px] text-muted mt-1 font-medium">24×7</Text>
+              <Text className="text-[10px] text-muted mt-1 font-medium" style={{ color: colors.textMuted }}>24×7</Text>
             </View>
           </View>
         </Animated.View>

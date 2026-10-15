@@ -5,7 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Send, Headphones, MessageSquare, Image as ImageIcon, Wifi, X } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
 import { subscribeToChatMessages, isSupabaseConfigured } from '@/lib/realtime';
 import { pickImage, uploadImage, PickedImage } from '@/lib/storage';
@@ -16,6 +16,7 @@ import { formatTime } from '@/utils/format';
 export default function ChatScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const colors = useThemeColors();
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [input, setInput] = React.useState('');
   const [loading, setLoading] = React.useState(true);
@@ -106,27 +107,27 @@ export default function ChatScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }} keyboardVerticalOffset={0}>
         {/* Header */}
-        <View className="px-5 py-3 flex-row items-center border-b border-line bg-white">
-          <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3">
+        <View className="px-5 py-3 flex-row items-center border-b border-line bg-white" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+          <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-2xl items-center justify-center bg-surface border border-lineLight mr-3" style={{ backgroundColor: colors.surface, borderColor: colors.borderLight }}>
             <ArrowLeft size={18} color={colors.text} />
           </Pressable>
           <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
             <Headphones size={18} color={colors.primary} />
           </View>
           <View className="ml-3 flex-1">
-            <Text className="text-textmain font-semibold text-sm">Food Munch Support</Text>
+            <Text className="text-textmain font-semibold text-sm" style={{ color: colors.text }}>Food Munch Support</Text>
             <View className="flex-row items-center">
               {isSupabaseConfigured ? (
                 <>
                   <Wifi size={9} color={live ? colors.success : colors.textSubtle} />
-                  <Text className="text-muted text-[11px] ml-1">
+                  <Text className="text-muted text-[11px] ml-1" style={{ color: colors.textMuted }}>
                     {live ? 'Live — syncing' : 'Online • Realtime on'}
                   </Text>
                 </>
               ) : (
                 <>
                   <View className="w-1.5 h-1.5 rounded-full mr-1" style={{ backgroundColor: colors.success }} />
-                  <Text className="text-muted text-[11px]">Online • Typically replies in 5 min</Text>
+                  <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>Online • Typically replies in 5 min</Text>
                 </>
               )}
             </View>
@@ -136,9 +137,9 @@ export default function ChatScreen() {
 
         {/* Pending image preview */}
         {pendingImage && (
-          <View className="px-4 py-2 bg-surface border-b border-line flex-row items-center">
+          <View className="px-4 py-2 bg-surface border-b border-line flex-row items-center" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
             <Image source={{ uri: pendingImage.uri }} style={{ width: 48, height: 48, borderRadius: 8 }} />
-            <Text className="text-muted text-xs ml-3 flex-1" numberOfLines={1}>{pendingImage.name}</Text>
+            <Text className="text-muted text-xs ml-3 flex-1" style={{ color: colors.textMuted }} numberOfLines={1}>{pendingImage.name}</Text>
             {uploading ? (
               <ActivityIndicator color={colors.primary} size="small" />
             ) : (
@@ -169,7 +170,7 @@ export default function ChatScreen() {
                   <View
                     className={`max-w-[78%] rounded-xl2 px-3.5 py-2.5`}
                     style={{
-                      backgroundColor: isMe ? colors.primary : '#fff',
+                      backgroundColor: isMe ? colors.primary : colors.surfaceElevated,
                       borderWidth: isMe ? 0 : 1,
                       borderColor: colors.border,
                       borderBottomRightRadius: isMe ? 4 : 14,
@@ -211,7 +212,7 @@ export default function ChatScreen() {
         )}
 
         {/* Input */}
-        <View className="flex-row items-center px-4 py-3 border-t border-line bg-white">
+        <View className="flex-row items-center px-4 py-3 border-t border-line bg-white" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
           <Pressable
             onPress={onPickImage}
             disabled={sending || uploading}
@@ -226,6 +227,7 @@ export default function ChatScreen() {
             placeholder="Type a message..."
             placeholderTextColor={colors.textMuted}
             className="flex-1 bg-surface rounded-full px-4 py-2.5 text-sm text-textmain border border-line"
+            style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}
             multiline
           />
           <Pressable

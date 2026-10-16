@@ -2,6 +2,41 @@
 
 A premium food + grocery delivery app built with **Expo SDK 52**, **React Native 0.76**, and **NativeWind v4** (Tailwind CSS for React Native).
 
+## 🗄️ Shared Database with FM-Admin
+
+**This app shares ONE Supabase database with the FM-Admin (Next.js admin console).**
+
+- **Database URL**: `https://dhmeyycjosacuwgtdhfo.supabase.co` (same in both apps)
+- **Unified SQL file**: `supabase/fm-user-admin-unified.sql` (also available as `supabase/migrations/0001_unified_schema.sql`)
+- **Admin app**: controls all data — products, stores, categories, vendors, delivery partners, orders, coupons, banners, etc.
+- **User app** (this one): reads from the same tables and writes customer-facing data (orders, cart, reviews, wallet, addresses)
+
+### How the admin controls the user app
+
+| Admin action | User app sees |
+|--------------|---------------|
+| Add a Product | Product appears in Home / Categories / Search |
+| Add a Store | Store appears in Top Stores / Store Detail pages |
+| Add a Category | Category appears in Category grid |
+| Add a Banner | Banner appears in Home carousel |
+| Add a Coupon | Coupon appears in Cart / Coupons page |
+| Update Order Status | Status updates live in Orders tab (via Supabase Realtime) |
+| Block a Customer | Customer can no longer sign in |
+| Toggle Store Open/Closed | Store shows as Open/Closed in user app |
+
+### Database schema (53 tables, 20 enums)
+
+The unified SQL file creates:
+- **Base tables** (26): users, customers, vendors, delivery_men, stores, products, categories, orders, order_items, wallets, payments, notifications, banners, reviews, coupons, addresses, cart_items, etc.
+- **SwitchEats extension tables** (27): zones, addons, employees, employee_roles, subscription_plans, support_tickets, delivery_withdrawals, restaurant_withdrawals, delivery_bonus, earning_addons, contact_messages, safety_emergency_reports, broadcast_notifications, feature_settings, business_settings, pages_social_media, restaurant_reviews, delivery_partner_reviews, food_approval_queue, pos_orders, etc.
+
+### Setup
+
+1. Create a Supabase project at https://supabase.com
+2. Open SQL Editor → paste the entire `supabase/fm-user-admin-unified.sql` (1602 lines) → Run
+3. Update `app.json` → `extra.supabaseUrl` and `extra.supabaseAnonKey` with your project's values
+4. Run `npx expo start` — the app will read from your Supabase database
+
 ## Features
 
 ### Auth (5 screens)

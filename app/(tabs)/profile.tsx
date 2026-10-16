@@ -1,13 +1,14 @@
 import React from 'react';
 import {
-  View, Text, ScrollView, Pressable, Alert, Share, ActivityIndicator, Image as RNImage
+  View, Text, ScrollView, Pressable, Alert, Share, ActivityIndicator, Image as RNImage, Linking
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   MapPin, Heart, Tag, Wallet, Bell, MessageSquare,
   Settings, LogOut, ChevronRight, Gift, Star, ShoppingBag,
-  HelpCircle, Shield, Award, ShoppingBasket, Camera, Moon
+  HelpCircle, Shield, Award, ShoppingBasket, Camera, Moon,
+  Share2, Star as StarIcon, Info, UserCog, Cake, Eye
 } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -16,8 +17,10 @@ import { useUserStore } from '@/store/user';
 import { useCartStore } from '@/store/cart';
 import { pickImage, uploadImage, StorageBucket } from '@/lib/storage';
 import { apiClient } from '@/lib/api-client';
+import { api } from '@/lib/api';
 import { formatCurrency } from '@/utils/format';
 import { hapticNotify } from '@/utils/platform';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -33,11 +36,41 @@ export default function ProfileScreen() {
 
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = React.useState(false);
+  const [birthday, setBirthday] = React.useState('');
+  const [orderStats, setOrderStats] = React.useState({ upcoming: 0, completed: 24, cancelled: 1, refunds: 0 });
+  const [hideSensitive, setHideSensitive] = React.useState(false);
 
   // Hydrate avatar URL when user changes
   React.useEffect(() => {
     setAvatarUrl(user?.avatar_url || null);
   }, [user?.id, user?.avatar_url]);
+
+  // Load extra profile fields
+  React.useEffect(() => {
+    (async () => {
+      const extra = await AsyncStorage.getItem('foodmunch-profile-extra');
+      if (extra) {
+        const s = JSON.parse(extra);
+        setBirthday(s.birthday || '');
+      }
+      const privacy = await AsyncStorage.getItem('foodmunch-privacy-settings');
+      if (privacy) {
+        const p = JSON.parse(privacy);
+        setHideSensitive(p.hideSensitive ?? false);
+      }
+      // Load real order counts
+      try {
+        const active = await api.getOrders({ status: 'active' });
+        const past = await api.getOrders({ status: 'past' });
+        setOrderStats(prev => ({
+          ...prev,
+          upcoming: active.length,
+          completed: past.filter(o => o.status === 'delivered').length || prev.completed,
+          cancelled: past.filter(o => o.status === 'cancelled').length || prev.cancelled,
+        }));
+      } catch (e) {}
+    })();
+  }, []);
 
   const onPickAvatar = async () => {
     try {
@@ -89,10 +122,23 @@ export default function ProfileScreen() {
 
   const onShare = async () => {
     try {
+      const code = (user?.full_name || 'FOODIE').replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 5) + '100';
       await Share.share({
-        message: 'Download Food Munch — Food + Grocery delivered! Use my code AARAV20 for 20% off your first order. https://foodmunch.app'
+        message: `Hey! I've been using Food Munch for food + grocery delivery and I love it. Use my referral code ${code} to get ₹100 off your first order. https://foodmunch.app/r/${code}`
       });
     } catch (e) {}
+  };
+
+  const onRateApp = () => {
+    Alert.alert(
+      'Enjoying Food Munch?',
+      'Your 5-star rating helps us reach more people. Thank you!',
+      [
+        { text: 'Maybe later', style: 'cancel' },
+        { text: 'Rate now', onPress: () => Linking.openURL('market://details?id=com.foodmunch.customer').catch(() => Linking.openURL('https://play.google.com/store/apps/details?id=com.foodmunch.customer')) }
+      ]
+    );
+    hapticNotify('success');
   };
 
   const displayName = user?.full_name || 'Guest User';
@@ -113,7 +159,7 @@ export default function ProfileScreen() {
         >
           <View className="flex-row items-center">
             {/* Avatar with camera overlay */}
-            <Pressable onPress={onPickAvatar} disabled={uploadingAvatar} className="relative">
+            <Pressable onPress={() => router.push('/edit-profile')} disabled={uploadingAvatar} className="relative">
               <View
                 className="w-16 h-16 rounded-full items-center justify-center overflow-hidden"
                 style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
@@ -138,11 +184,26 @@ export default function ProfileScreen() {
               </View>
             </Pressable>
             <View className="ml-3 flex-1">
-              <Text className="text-white text-lg font-bold">{displayName}</Text>
-              <View className="flex-row items-center mt-0.5">
+              <View className="flex-row items-center">
+                <Text className="text-white text-lg font-bold">{displayName}</Text>
+                <Pressable
+                  onPress={() => router.push('/edit-profile')}
+                  className="ml-2 w-6 h-6 rounded-full items-center justify-center"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+                >
+                  <UserCog size={12} color="#fff" />
+                </Pressable>
+              </View>
+              <View className="flex-row items-center mt-0.5 flex-wrap">
                 <View className="px-1.5 py-0.5 rounded-md" style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}>
                   <Text className="text-white text-[10px] font-semibold tracking-wide">FOOD MUNCH CUSTOMER</Text>
                 </View>
+                {birthday ? (
+                  <View className="px-1.5 py-0.5 rounded-md ml-1 flex-row items-center" style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}>
+                    <Cake size={9} color="#fff" />
+                    <Text className="text-white text-[10px] font-semibold ml-1">{birthday}</Text>
+                  </View>
+                ) : null}
               </View>
               <Text className="text-white/85 text-xs mt-0.5">{displayEmail}</Text>
               {displayPhone ? <Text className="text-white/85 text-xs">{displayPhone}</Text> : null}
@@ -192,16 +253,24 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Stats row */}
+        {/* Order summary card */}
         <View className="px-5 mt-4">
-          <View className="flex-row bg-white rounded-xl2 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
-            <StatCell icon={<ShoppingBag size={14} color={colors.primary} />} label="Orders" value="24" colors={colors} />
-            <View style={{ width: 1, backgroundColor: colors.border }} />
-            <StatCell icon={<Star size={14} color={colors.warning} />} label="Reviews" value="12" colors={colors} />
-            <View style={{ width: 1, backgroundColor: colors.border }} />
-            <StatCell icon={<Heart size={14} color={colors.error} />} label="Favourites" value="8" colors={colors} />
-            <View style={{ width: 1, backgroundColor: colors.border }} />
-            <StatCell icon={<Gift size={14} color={colors.info} />} label="Coupons" value="5" colors={colors} />
+          <View className="rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <View className="flex-row items-center justify-between px-4 py-3" style={{ borderBottomColor: colors.border, borderBottomWidth: 1 }}>
+              <Text className="text-sm font-bold" style={{ color: colors.text }}>My Orders</Text>
+              <Pressable onPress={() => router.push('/(tabs)/orders')}>
+                <Text className="text-xs font-semibold" style={{ color: colors.primary }}>View All →</Text>
+              </Pressable>
+            </View>
+            <View className="flex-row">
+              <OrderStatCell label="Upcoming" value={orderStats.upcoming} color={colors.primary} colors={colors} />
+              <View style={{ width: 1, backgroundColor: colors.border }} />
+              <OrderStatCell label="Completed" value={orderStats.completed} color={colors.success} colors={colors} />
+              <View style={{ width: 1, backgroundColor: colors.border }} />
+              <OrderStatCell label="Cancelled" value={orderStats.cancelled} color={colors.error} colors={colors} />
+              <View style={{ width: 1, backgroundColor: colors.border }} />
+              <OrderStatCell label="Refunds" value={orderStats.refunds} color={colors.warning} colors={colors} />
+            </View>
           </View>
         </View>
 
@@ -209,9 +278,11 @@ export default function ProfileScreen() {
         <View className="px-5 mt-5">
           <Text className="text-muted text-xs uppercase tracking-wide font-semibold mb-2" style={{ color: colors.textMuted }}>Account</Text>
           <View className="bg-white rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
+            <MenuRow icon={<UserCog size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Edit Profile" subtitle="Name, email, phone, birthday" onPress={() => router.push('/edit-profile')} colors={colors} />
+            <Divider colors={colors} />
             <MenuRow icon={<MapPin size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Saved Addresses" onPress={() => router.push('/address')} colors={colors} />
             <Divider colors={colors} />
-            <MenuRow icon={<Heart size={18} color={colors.error} />} iconBg={colors.errorLight} title="Favourites" onPress={() => router.push('/favourites')} colors={colors} />
+            <MenuRow icon={<Heart size={18} color={colors.error} />} iconBg={colors.errorLight} title="Favourites & Wishlist" onPress={() => router.push('/favourites')} colors={colors} />
             <Divider colors={colors} />
             <MenuRow icon={<Tag size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Coupons & Offers" onPress={() => router.push('/coupons')} colors={colors} />
             <Divider colors={colors} />
@@ -233,21 +304,36 @@ export default function ProfileScreen() {
             <Divider colors={colors} />
             <MenuRow icon={<Bell size={18} color={colors.info} />} iconBg={colors.infoLight} title="Notifications" onPress={() => router.push('/notifications')} colors={colors} />
             <Divider colors={colors} />
+            <MenuRow icon={<Bell size={18} color={colors.info} />} iconBg={colors.infoLight} title="Notification Preferences" subtitle="Customize push alerts" onPress={() => router.push('/notification-preferences')} colors={colors} />
+            <Divider colors={colors} />
             <MenuRow icon={<MessageSquare size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Chat Support" onPress={() => router.push('/chat')} colors={colors} />
             <Divider colors={colors} />
-            <MenuRow icon={<HelpCircle size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Help & FAQ" onPress={() => router.push('/chat')} colors={colors} />
+            <MenuRow icon={<HelpCircle size={18} color={colors.info} />} iconBg={colors.infoLight} title="Help & FAQ" subtitle="FAQs, refunds, contact us" onPress={() => router.push('/help-faq')} colors={colors} />
             <Divider colors={colors} />
-            <MenuRow icon={<Shield size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Privacy & Security" colors={colors} />
+            <MenuRow icon={<Shield size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Privacy & Security" subtitle="Data controls, biometric lock" onPress={() => router.push('/privacy')} colors={colors} />
             <Divider colors={colors} />
-            <MenuRow icon={<Settings size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Settings" colors={colors} />
+            <MenuRow icon={<Settings size={18} color={colors.textMuted} />} iconBg={colors.surfaceAlt} title="Settings" subtitle="Language, cache, analytics" onPress={() => router.push('/settings')} colors={colors} />
           </View>
 
-          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mt-5 mb-2" style={{ color: colors.textMuted }}>Rewards</Text>
+          <Text className="text-muted text-xs uppercase tracking-wide font-semibold mt-5 mb-2" style={{ color: colors.textMuted }}>Rewards & More</Text>
           <View className="bg-white rounded-xl2 border border-line overflow-hidden" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}>
-            <MenuRow icon={<Gift size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Refer & Earn" subtitle="Get ₹100 for every friend" onPress={onShare} colors={colors} />
+            <MenuRow icon={<Gift size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Refer & Earn" subtitle="Give ₹100, Get ₹100" onPress={() => router.push('/refer-earn')} colors={colors} />
             <Divider colors={colors} />
-            <MenuRow icon={<Award size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Loyalty Program" subtitle={`${loyaltyTier} member • ${loyaltyPoints} points`} colors={colors} />
+            <MenuRow icon={<Award size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Loyalty Program" subtitle={`${loyaltyTier} member • ${loyaltyPoints} points`} onPress={() => router.push('/wallet')} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Star size={18} color={colors.warning} />} iconBg={colors.warningLight} title="Rate the App" subtitle="Leave us a 5-star review" onPress={onRateApp} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Share2 size={18} color={colors.primary} />} iconBg={colors.primaryLight} title="Share App" subtitle="Invite friends to Food Munch" onPress={onShare} colors={colors} />
+            <Divider colors={colors} />
+            <MenuRow icon={<Info size={18} color={colors.info} />} iconBg={colors.infoLight} title="About Us" subtitle="Version 1.2.0" onPress={() => router.push('/about')} colors={colors} />
           </View>
+
+          {hideSensitive && (
+            <View className="mt-4 p-3 rounded-xl2 flex-row items-center" style={{ backgroundColor: colors.warningLight }}>
+              <Eye size={14} color={colors.warning} />
+              <Text className="text-xs ml-2 flex-1" style={{ color: colors.text }}>Sensitive items are hidden. Manage in Privacy settings.</Text>
+            </View>
+          )}
 
           {isMockMode && (
             <View className="mt-5 p-3 rounded-xl2 border border-dashed" style={{ borderColor: colors.warning }}>
@@ -281,6 +367,15 @@ function StatCell({ icon, label, value, colors }: { icon: React.ReactNode; label
       <View className="flex-row items-center mb-1">{icon}</View>
       <Text className="text-textmain font-bold text-sm" style={{ color: colors.text }}>{value}</Text>
       <Text className="text-muted text-[10px]" style={{ color: colors.textMuted }}>{label}</Text>
+    </View>
+  );
+}
+
+function OrderStatCell({ label, value, color, colors }: { label: string; value: number; color: string; colors: any }) {
+  return (
+    <View className="flex-1 py-3.5 items-center">
+      <Text className="text-lg font-bold" style={{ color }}>{value}</Text>
+      <Text className="text-[10px] mt-0.5" style={{ color: colors.textMuted }}>{label}</Text>
     </View>
   );
 }

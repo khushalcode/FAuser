@@ -84,6 +84,9 @@ import { LiveDeliveryTracker } from '@/components/LiveDeliveryTracker';
 import { PromoCodeStrip } from '@/components/PromoCodeStrip';
 import { TrendingRecipes } from '@/components/TrendingRecipes';
 import { DeliveryPromiseBanner } from '@/components/DeliveryPromiseBanner';
+import { ValueMealsBanner } from '@/components/ValueMealsBanner';
+import { RestaurantsDeliveringBanner } from '@/components/RestaurantsDeliveringBanner';
+import { PopularCuisinesStrip } from '@/components/PopularCuisinesStrip';
 import { getProductImage } from '@/utils/images';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -464,6 +467,21 @@ export default function HomeScreen() {
                 onPress={(s) => router.push(`/store/${s.id}`)}
               />
             )}
+          </Section>
+
+          {/* NEW: Restaurants Delivering To You count banner */}
+          <Section style={fadeOpacity(7)}>
+            <RestaurantsDeliveringBanner />
+          </Section>
+
+          {/* NEW: Popular Cuisines strip */}
+          <Section style={fadeOpacity(7)}>
+            <PopularCuisinesStrip />
+          </Section>
+
+          {/* NEW: 99 Store / Value Meals banner */}
+          <Section style={fadeOpacity(8)}>
+            <ValueMealsBanner />
           </Section>
 
           {/* NEW: Trending Recipes — cook tonight's dinner */}

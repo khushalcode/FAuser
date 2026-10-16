@@ -95,33 +95,33 @@ export interface ThemeColors {
 }
 
 export const lightColors: ThemeColors = {
-  primary: '#12B76A',
-  primaryDark: '#039855',
-  primaryLight: '#D1FADF',
-  primary50: '#ECFDF3',
-  primary100: '#D1FADF',
-  primary200: '#A6F4C5',
-  primary300: '#6CE9A6',
-  primary400: '#32D583',
-  primary500: '#12B76A',
-  primary600: '#039855',
-  primary700: '#027A48',
-  primary800: '#05603A',
-  primary900: '#054F31',
+  primary: '#FF7A00',
+  primaryDark: '#E56700',
+  primaryLight: '#FFE9D6',
+  primary50: '#FFF5EB',
+  primary100: '#FFE9D6',
+  primary200: '#FFD1A8',
+  primary300: '#FFB270',
+  primary400: '#FF9340',
+  primary500: '#FF7A00',
+  primary600: '#E56700',
+  primary700: '#C25400',
+  primary800: '#8F3E00',
+  primary900: '#662C00',
 
   background: '#FFFFFF',
-  surface: '#F7F8FA',
-  surfaceAlt: '#EEF0F3',
+  surface: '#FAF7F4',
+  surfaceAlt: '#F3EEE9',
   surfaceElevated: '#FFFFFF',
 
-  text: '#101828',
-  textMuted: '#667085',
-  textSubtle: '#98A2B3',
+  text: '#17120D',
+  textMuted: '#6F665E',
+  textSubtle: '#A39A91',
   textOnPrimary: '#FFFFFF',
   textInverse: '#FFFFFF',
 
-  border: '#E4E7EC',
-  borderLight: '#F2F4F7',
+  border: '#E9E2DB',
+  borderLight: '#F4EFEA',
 
   error: '#F04438',
   errorLight: '#FEE4E2',
@@ -132,8 +132,8 @@ export const lightColors: ThemeColors = {
   info: '#3B82F6',
   infoLight: '#DBEAFE',
 
-  food: '#F59E0B',
-  foodLight: '#FEF3C7',
+  food: '#FF7A00',
+  foodLight: '#FFE9D6',
   grocery: '#12B76A',
   groceryLight: '#D1FADF',
 
@@ -164,38 +164,38 @@ export const lightColors: ThemeColors = {
 
   overlay: 'rgba(16, 24, 40, 0.45)',
   scrim: 'rgba(16, 24, 40, 0.6)',
-  shimmerBase: '#E4E7EC',
-  shimmerHighlight: '#F2F4F7',
+  shimmerBase: '#EAE3DC',
+  shimmerHighlight: '#F6F1EC',
 };
 
 export const darkColors: ThemeColors = {
-  primary: '#32D583',         // brighter emerald for dark mode contrast
-  primaryDark: '#12B76A',
-  primaryLight: '#054F31',
-  primary50: '#0B3A24',
-  primary100: '#0B3A24',
-  primary200: '#027A48',
-  primary300: '#039855',
-  primary400: '#12B76A',
-  primary500: '#32D583',
-  primary600: '#6CE9A6',
-  primary700: '#A6F4C5',
-  primary800: '#D1FADF',
-  primary900: '#ECFDF3',
+  primary: '#FF7A00',         // brighter emerald for dark mode contrast
+  primaryDark: '#E56700',
+  primaryLight: '#2B1808',
+  primary50: '#1F1209',
+  primary100: '#2B1808',
+  primary200: '#5A3008',
+  primary300: '#8F4A0A',
+  primary400: '#C25E05',
+  primary500: '#FF7A00',
+  primary600: '#FF9340',
+  primary700: '#FFB270',
+  primary800: '#FFD1A8',
+  primary900: '#FFE9D6',
 
-  background: '#0B0F14',      // near-black with subtle blue
-  surface: '#11161D',         // one shade lighter for sections
-  surfaceAlt: '#1A212B',      // cards / inputs
-  surfaceElevated: '#1F2733', // elevated cards / sheets
+  background: '#0F0F0F',      // near-black with subtle blue
+  surface: '#141414',         // one shade lighter for sections
+  surfaceAlt: '#1C1C1C',      // cards / inputs
+  surfaceElevated: '#1A1A1A', // elevated cards / sheets
 
-  text: '#F3F5F7',
-  textMuted: '#A6B0BE',
-  textSubtle: '#6B7689',
-  textOnPrimary: '#0B0F14',
-  textInverse: '#0B0F14',
+  text: '#F5F5F5',
+  textMuted: '#A3A3A3',
+  textSubtle: '#6E6E6E',
+  textOnPrimary: '#FFFFFF',
+  textInverse: '#0F0F0F',
 
-  border: '#2A3441',
-  borderLight: '#1F2733',
+  border: '#2A2A2A',
+  borderLight: '#202020',
 
   error: '#F04438',
   errorLight: '#3A1414',
@@ -206,8 +206,8 @@ export const darkColors: ThemeColors = {
   info: '#3B82F6',
   infoLight: '#0E1F3A',
 
-  food: '#F59E0B',
-  foodLight: '#3A2A0A',
+  food: '#FF7A00',
+  foodLight: '#2B1808',
   grocery: '#12B76A',
   groceryLight: '#0B3A24',
 
@@ -238,8 +238,8 @@ export const darkColors: ThemeColors = {
 
   overlay: 'rgba(0, 0, 0, 0.65)',
   scrim: 'rgba(0, 0, 0, 0.78)',
-  shimmerBase: '#1F2733',
-  shimmerHighlight: '#2A3441',
+  shimmerBase: '#1C1C1C',
+  shimmerHighlight: '#2A2A2A',
 };
 
 /**

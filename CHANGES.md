@@ -135,3 +135,15 @@ Then scan QR with Expo Go, or press `i` for iOS simulator, `a` for Android emula
 
 ## Backend
 Untouched: `src/lib/*`, `src/store/*`, `supabase/`, `plugins/`, app config, package.json.
+
+# UI Redesign v2 — Dark + Orange food-app style
+
+UI only; no API, store or routing logic changed.
+
+- Palette: orange (#FF7A00) accent, near-black dark theme, now the default mode (src/theme/colors.ts, tailwind.config.js, src/store/theme.ts). Light mode kept with a warm orange palette.
+- Bottom nav: flat dark bar, orange active icon/label.
+- Home header: location pill + wallet/bell/avatar, pill search with mic, VEG toggle (visual only), round image chips for tabs.
+- Home hero: full-bleed image card, NEW LAUNCH tag, orange CTA.
+- Home layout: hero, quick filter pills, ₹99 store, cuisines, brands, restaurants, grocery, featured, carousels, coupons, product grid.
+  Removed from home (components still in src/components): DeliveryPromiseBanner, LiveOrderBanner, QuickActionsGrid, StatsStrip, LiveDeliveryTracker, OffersStrip, BestsellersGrid, PromoBanner, Snacks CategoryGrid, TrendingRecipes, CashbackBanner, MembershipCard, FestivalTile.
+- Profile: dark header, 2x2 shortcut grid (Wallet / Coupons / Cart / Addresses).

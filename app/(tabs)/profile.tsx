@@ -33,6 +33,7 @@ export default function ProfileScreen() {
   const loyaltyTier = useUserStore((s) => s.loyaltyTier);
   const loyaltyProgress = useUserStore((s) => s.loyaltyProgress);
   const clearCart = useCartStore((s) => s.clear);
+  const cartCount = useCartStore((s) => s.itemCount());
 
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = React.useState(false);
@@ -146,7 +147,7 @@ export default function ProfileScreen() {
   const displayPhone = user?.phone || '';
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.primary }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <ScrollView
         style={{ flex: 1, backgroundColor: colors.background }}
         showsVerticalScrollIndicator={false}
@@ -154,15 +155,15 @@ export default function ProfileScreen() {
       >
         {/* Header */}
         <View
-          style={{ backgroundColor: colors.primary }}
-          className="px-5 pt-3 pb-16 rounded-b-[2rem]"
+          style={{ backgroundColor: colors.background }}
+          className="px-5 pt-3 pb-5"
         >
           <View className="flex-row items-center">
             {/* Avatar with camera overlay */}
             <Pressable onPress={() => router.push('/edit-profile')} disabled={uploadingAvatar} className="relative">
               <View
                 className="w-16 h-16 rounded-full items-center justify-center overflow-hidden"
-                style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
+                style={{ backgroundColor: colors.primary, borderWidth: 2, borderColor: colors.primaryLight }}
               >
                 {avatarUrl ? (
                   <RNImage source={typeof avatarUrl === "string" ? { uri: avatarUrl } : avatarUrl} style={{ width: 64, height: 64 }} resizeMode="cover" />
@@ -174,7 +175,7 @@ export default function ProfileScreen() {
               </View>
               <View
                 className="absolute bottom-0 right-0 w-6 h-6 rounded-full items-center justify-center border-2"
-                style={{ backgroundColor: colors.primary, borderColor: '#fff' }}
+                style={{ backgroundColor: colors.primary, borderColor: colors.background }}
               >
                 {uploadingAvatar ? (
                   <ActivityIndicator size={10} color="#fff" />
@@ -185,71 +186,68 @@ export default function ProfileScreen() {
             </Pressable>
             <View className="ml-3 flex-1">
               <View className="flex-row items-center">
-                <Text className="text-white text-lg font-bold">{displayName}</Text>
+                <Text className="text-lg font-bold" style={{ color: colors.text }}>{displayName}</Text>
                 <Pressable
                   onPress={() => router.push('/edit-profile')}
                   className="ml-2 w-6 h-6 rounded-full items-center justify-center"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+                  style={{ backgroundColor: colors.surfaceAlt }}
                 >
-                  <UserCog size={12} color="#fff" />
+                  <UserCog size={12} color={colors.primary} />
                 </Pressable>
               </View>
               <View className="flex-row items-center mt-0.5 flex-wrap">
-                <View className="px-1.5 py-0.5 rounded-md" style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}>
-                  <Text className="text-white text-[10px] font-semibold tracking-wide">FOOD MUNCH CUSTOMER</Text>
+                <View className="px-1.5 py-0.5 rounded-md" style={{ backgroundColor: colors.primaryLight }}>
+                  <Text className="text-[10px] font-semibold tracking-wide" style={{ color: colors.primary }}>FOOD MUNCH CUSTOMER</Text>
                 </View>
                 {birthday ? (
-                  <View className="px-1.5 py-0.5 rounded-md ml-1 flex-row items-center" style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}>
-                    <Cake size={9} color="#fff" />
-                    <Text className="text-white text-[10px] font-semibold ml-1">{birthday}</Text>
+                  <View className="px-1.5 py-0.5 rounded-md ml-1 flex-row items-center" style={{ backgroundColor: colors.primaryLight }}>
+                    <Cake size={9} color={colors.primary} />
+                    <Text className="text-[10px] font-semibold ml-1" style={{ color: colors.primary }}>{birthday}</Text>
                   </View>
                 ) : null}
               </View>
-              <Text className="text-white/85 text-xs mt-0.5">{displayEmail}</Text>
-              {displayPhone ? <Text className="text-white/85 text-xs">{displayPhone}</Text> : null}
+              <Text className="text-xs mt-0.5" style={{ color: colors.textMuted }}>{displayEmail}</Text>
+              {displayPhone ? <Text className="text-xs" style={{ color: colors.textMuted }}>{displayPhone}</Text> : null}
             </View>
             <Pressable
               onPress={() => router.push('/chat')}
               className="w-10 h-10 rounded-full items-center justify-center"
-              style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+              style={{ backgroundColor: colors.surfaceAlt, borderWidth: 1, borderColor: colors.border }}
             >
-              <MessageSquare size={18} color="#fff" />
+              <MessageSquare size={18} color={colors.primary} />
             </Pressable>
           </View>
         </View>
 
-        {/* Loyalty + wallet cards */}
-        <View className="px-5 -mt-12">
-          <View className="flex-row">
-            <View className="flex-1 bg-white rounded-xl2 p-3.5 mr-2 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, elevation: 2, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6 }}>
-              <View className="flex-row items-center">
-                <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: colors.primaryLight }}>
-                  <Wallet size={16} color={colors.primary} />
+        {/* Shortcut grid */}
+        <View className="px-5">
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 }}>
+            {[
+              { key: 'wallet', label: 'Wallet', value: 'View Balance', sub: formatCurrency(walletBalance), Icon: Wallet, route: '/wallet' },
+              { key: 'coupons', label: 'Coupons', value: 'View Offers', sub: 'Save more', Icon: Tag, route: '/coupons' },
+              { key: 'cart', label: 'My Cart', value: 'View Cart', sub: `${cartCount} item${cartCount === 1 ? '' : 's'}`, Icon: ShoppingBag, route: '/(tabs)/cart' },
+              { key: 'addr', label: 'Saved Addresses', value: 'Manage', sub: 'Delivery spots', Icon: MapPin, route: '/address' }
+            ].map(({ key, label, value, sub, Icon, route }) => (
+              <Pressable
+                key={key}
+                onPress={() => router.push(route as any)}
+                style={{
+                  width: '48.5%', flexDirection: 'row', alignItems: 'center', gap: 10,
+                  padding: 12, borderRadius: 16, borderWidth: 1,
+                  backgroundColor: colors.surfaceElevated, borderColor: colors.border
+                }}
+              >
+                <View style={{ width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primaryLight }}>
+                  <Icon size={18} color={colors.primary} />
                 </View>
-                <View className="ml-2">
-                  <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>Wallet</Text>
-                  <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>{formatCurrency(walletBalance)}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text numberOfLines={1} style={{ color: colors.textMuted, fontSize: 10.5 }}>{label}</Text>
+                  <Text numberOfLines={1} style={{ color: colors.text, fontSize: 13, fontWeight: '700' }}>{value}</Text>
+                  <Text numberOfLines={1} style={{ color: colors.primary, fontSize: 10.5, marginTop: 1 }}>{sub}</Text>
                 </View>
-              </View>
-              <Pressable onPress={() => router.push('/wallet')} className="mt-2">
-                <Text className="text-primary text-xs font-semibold" style={{ color: colors.primary }}>View →</Text>
+                <ChevronRight size={14} color={colors.textSubtle} />
               </Pressable>
-            </View>
-
-            <View className="flex-1 bg-white rounded-xl2 p-3.5 ml-2 border border-line" style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border, elevation: 2, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6 }}>
-              <View className="flex-row items-center">
-                <View className="w-9 h-9 rounded-xl items-center justify-center" style={{ backgroundColor: colors.warningLight }}>
-                  <Award size={16} color={colors.warning} />
-                </View>
-                <View className="ml-2">
-                  <Text className="text-muted text-[11px]" style={{ color: colors.textMuted }}>{loyaltyTier} Tier</Text>
-                  <Text className="text-textmain font-bold text-base" style={{ color: colors.text }}>{loyaltyPoints} pts</Text>
-                </View>
-              </View>
-              <View className="mt-2 h-1 rounded-full bg-line overflow-hidden" style={{ backgroundColor: colors.borderLight }}>
-                <View style={{ width: `${loyaltyProgress * 100}%`, height: '100%', backgroundColor: colors.warning }} />
-              </View>
-            </View>
+            ))}
           </View>
         </View>
 

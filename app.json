@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#10B981"
+      "backgroundColor": "#0F0F0F"
     },
     "ios": {
       "supportsTablet": true,
@@ -22,7 +22,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#10B981"
+        "backgroundColor": "#0F0F0F"
       },
       "package": "com.foodmunch.customer",
       "permissions": [
@@ -53,7 +53,7 @@
       [
         "expo-notifications",
         {
-          "color": "#10B981",
+          "color": "#0F0F0F",
           "defaultChannel": "orders",
           "androidIcons": [
             {

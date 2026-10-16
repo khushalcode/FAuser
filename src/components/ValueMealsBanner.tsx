@@ -45,11 +45,11 @@ export function ValueMealsBanner({ onPress }: ValueMealsBannerProps) {
           style={{
             borderRadius: 18,
             overflow: 'hidden',
-            backgroundColor: '#1565C0',
+            backgroundColor: '#FF7A00',
             padding: 16,
             flexDirection: 'row',
             alignItems: 'center',
-            shadowColor: '#1565C0',
+            shadowColor: '#FF7A00',
             shadowOpacity: 0.25,
             shadowRadius: 10,
             elevation: 4,
@@ -61,7 +61,7 @@ export function ValueMealsBanner({ onPress }: ValueMealsBannerProps) {
                 <Text style={{ color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 }}>99 STORE</Text>
               </View>
               <View style={{ backgroundColor: '#fff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, marginLeft: 6 }}>
-                <Text style={{ color: '#1565C0', fontSize: 10, fontWeight: '800' }}>FREE DELIVERY</Text>
+                <Text style={{ color: '#FF7A00', fontSize: 10, fontWeight: '800' }}>FREE DELIVERY</Text>
               </View>
             </View>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: '800', lineHeight: 22 }}>
@@ -72,8 +72,8 @@ export function ValueMealsBanner({ onPress }: ValueMealsBannerProps) {
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
               <View style={{ backgroundColor: '#fff', borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6, flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ color: '#1565C0', fontSize: 12, fontWeight: '700' }}>Explore ₹99 Meals</Text>
-                <ChevronRight size={13} color="#1565C0" />
+                <Text style={{ color: '#FF7A00', fontSize: 12, fontWeight: '700' }}>Explore ₹99 Meals</Text>
+                <ChevronRight size={13} color="#FF7A00" />
               </View>
             </View>
           </View>

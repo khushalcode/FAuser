@@ -13,13 +13,13 @@ import { Platform } from 'react-native';
  */
 import React from 'react';
 import { Pressable, View, Text, TextInput, StyleSheet, Animated, Easing } from 'react-native';
-import { Search } from 'lucide-react-native';
+import { Search, Mic } from 'lucide-react-native';
 import { useThemeColors } from '@/store/theme';
 import { useRouter } from 'expo-router';
 
 const ROTATING_PLACEHOLDERS = [
+  "Search for 'Pizza', 'Burger', 'Fries'...",
   'Search for biryani',
-  'Search for fresh vegetables',
   'Search for cakes & pastries',
   'Search for mithai & sweets'
 ];
@@ -93,7 +93,7 @@ export function SearchBar({
   return (
     <Pressable
       onPress={() => readOnly && router.push('/search')}
-      style={[styles.wrap, { backgroundColor: colors.surface, borderColor: colors.border }]}
+      style={[styles.wrap, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}
       disabled={!readOnly}
     >
       <Search size={17} color={colors.textMuted} strokeWidth={2.4} />
@@ -118,6 +118,7 @@ export function SearchBar({
               {displayPlaceholder || 'Search for restaurants, dishes, groceries...'}
             </Text>
           )}
+          <Mic size={16} color={colors.textMuted} strokeWidth={2.2} style={{ position: 'absolute', right: 0 }} />
         </View>
       ) : (
         <TextInput
@@ -139,9 +140,9 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 11,
+    borderRadius: 24,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
     borderWidth: 1
   },
   placeholderWrap: {

@@ -3,7 +3,7 @@
  *
  *   - Sits in normal layout flow (not absolute), so screen content and sticky
  *     CTAs end exactly above it — nothing is ever hidden behind the bar.
- *   - Active tab gets a soft green pill + bold label.
+ *   - Active tab gets an orange icon + label (dark, flat bar).
  *   - Secondary screens (product, store, wallet, checkout...) highlight the
  *     tab they belong to, so it always feels like one tabbed app.
  *   - Hides itself while the keyboard is open.
@@ -87,7 +87,7 @@ export function BottomNav({ cartCount = 0, activeOrders = 0 }: Props) {
   };
 
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8), backgroundColor: colors.background, borderTopColor: colors.borderLight }]}
+    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8), backgroundColor: colors.surface, borderTopColor: colors.border }]}
     >
       {TABS.map(({ key, label, route, Icon }) => {
         const active = current === key;
@@ -102,20 +102,20 @@ export function BottomNav({ cartCount = 0, activeOrders = 0 }: Props) {
             accessibilityState={{ selected: active }}
             accessibilityLabel={label}
           >
-            <View style={[styles.iconPill, active && { backgroundColor: colors.primaryLight }]}>
+            <View style={styles.iconPill}>
               <Icon
-                size={21}
+                size={22}
                 color={color}
-                strokeWidth={active ? 2.4 : 2}
-                fill={active ? colors.primaryLight : 'transparent'}
+                strokeWidth={active ? 2.4 : 1.9}
+                fill="transparent"
               />
               {badge > 0 ? (
-                <View style={[styles.badge, { borderColor: colors.background }]}>
+                <View style={[styles.badge, { borderColor: colors.surface, backgroundColor: colors.primary }]}>
                   <Text style={styles.badgeText}>{badge > 99 ? '99+' : badge}</Text>
                 </View>
               ) : null}
             </View>
-            <Text style={[styles.label, { color, fontWeight: active ? '800' : '600' }]}>{label}</Text>
+            <Text style={[styles.label, { color, fontWeight: active ? '700' : '500' }]}>{label}</Text>
           </Pressable>
         );
       })}
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     borderTopWidth: 1,
     shadowColor: '#000',
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: -4 },
     elevation: 16
@@ -143,9 +143,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   iconPill: {
-    width: 52,
-    height: 30,
-    borderRadius: 15,
+    width: 44,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative'

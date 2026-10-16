@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 /**
- * Home screen — Blinkit-style premium quick-commerce UI.
+ * Home screen — dark, orange-accent food-delivery UI (hero, search + VEG,
+ * cuisine chips, ₹99 store, brands, restaurants).
  *
  * Sections (in spec order):
  *   1. StickyHeader (collapsible) — logo, location, wallet, profile.
@@ -41,11 +42,12 @@ import {
   StyleSheet,
   Dimensions,
   Animated,
-  Easing
+  Easing,
+  ScrollView
 } from 'react-native';
 import { Pressable } from '@/components/SafePressable';
 import { useRouter } from 'expo-router';
-import { ChevronUp, ChevronRight } from 'lucide-react-native';
+import { ChevronUp, ChevronRight, Flame, Tag, Gift } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useThemeColors } from '@/store/theme';
 import { api } from '@/lib/api';
@@ -101,20 +103,10 @@ const TABS = [
 
 // Per-tab header tints. Switching tabs smoothly interpolates between these.
 const TAB_TINTS: Record<string, string> = {
-  all: '#12B76A',
-  restaurants: '#F59E0B',
-  grocery: '#027A48',
-  sweets: '#EC4899',
-  bakery: '#8B5CF6'
+  all: '#FF7A00', restaurants: '#FF7A00', grocery: '#FF7A00', sweets: '#FF7A00', bakery: '#FF7A00'
 };
 
-const TAB_ACCENTS: Record<string, string> = {
-  all: '#12B76A',
-  restaurants: '#F59E0B',
-  grocery: '#027A48',
-  sweets: '#EC4899',
-  bakery: '#8B5CF6'
-};
+const TAB_ACCENTS: Record<string, string> = TAB_TINTS;
 
 // Each home section is isolated: if one component throws, only that section
 // disappears instead of crashing the whole home screen.
@@ -350,90 +342,70 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: 28 }}
         >
-          {/* Section 4: Hero Banner Carousel */}
+          {/* Hero banner */}
           <Section style={[styles.heroWrap, fadeOpacity(1)]}>
             {heroBanners.length > 0 ? (
               <HeroCarousel banners={heroBanners} />
             ) : (
-              <SkeletonShimmer width="100%" height={140} radius={16} />
-            )}
-          </Section>
-
-          {/* NEW: Delivery Promise Banner (8-min delivery highlight) */}
-          <Section style={fadeOpacity(1)}>
-            <DeliveryPromiseBanner />
-          </Section>
-
-          {/* NEW: Live Order Banner */}
-          <Section style={fadeOpacity(1)}>
-            <View style={{ marginTop: 12 }}>
-              <LiveOrderBanner
-                storeName="Biryani Blues"
-                etaMins={8}
-                status="on_the_way"
-                onPress={() => router.push('/order/o1')}
-              />
-            </View>
-          </Section>
-
-          {/* NEW: Quick Actions Grid */}
-          <Section style={fadeOpacity(2)}>
-            <QuickActionsGrid onPress={(a) => {
-              if (a.id === 'reorder') router.push('/(tabs)/orders');
-              else if (a.id === 'wallet') router.push('/wallet');
-              else if (a.id === 'offers') router.push('/coupons');
-              else if (a.id === 'help') router.push('/chat');
-            }} />
-          </Section>
-
-          {/* NEW: Stats Strip */}
-          <Section style={fadeOpacity(2)}>
-            <View style={{ marginTop: 14 }}>
-              <StatsStrip />
-            </View>
-          </Section>
-
-          {/* NEW: Live Delivery Tracker (animated route) */}
-          <Section style={fadeOpacity(3)}>
-            <LiveDeliveryTracker />
-          </Section>
-
-          {/* NEW: Offers Strip */}
-          <Section style={fadeOpacity(3)}>
-            <OffersStrip onPress={() => router.push('/coupons')} />
-          </Section>
-
-          {/* Section 5: Bestsellers Grid (3x2) */}
-          <Section style={fadeOpacity(4)}>
-            {loading ? (
-              <View style={styles.section}>
-                <View style={styles.skelHeader}>
-                  <SkeletonShimmer width={120} height={20} />
-                </View>
-                <SkeletonBestsellers />
+              <View style={{ paddingHorizontal: 12 }}>
+                <SkeletonShimmer width="100%" height={200} radius={22} />
               </View>
-            ) : (
-              <BestsellersGrid
-                tiles={bestsellers}
-                onSeeAll={() => router.push('/(tabs)/categories')}
-                onTilePress={(t) =>
-                  router.push(`/search?q=${encodeURIComponent(t.title)}`)
-                }
-              />
             )}
           </Section>
 
-          {/* NEW: Brands Strip */}
+          {/* Quick filter pills */}
+          <Section style={fadeOpacity(1)}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterRow}
+            >
+              {[
+                { label: 'Trending Now', Icon: Flame, onPress: () => router.push('/search') },
+                { label: '₹99 Store', Icon: Tag, onPress: () => router.push('/search?q=99%20store') },
+                { label: 'Buy 1 Get 1 Free', Icon: Gift, onPress: () => router.push('/coupons') }
+              ].map(({ label, Icon, onPress }) => (
+                <Pressable
+                  key={label}
+                  onPress={onPress}
+                  style={[styles.filterPill, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}
+                >
+                  <Icon size={14} color={colors.primary} strokeWidth={2.4} />
+                  <Text style={[styles.filterText, { color: colors.text }]}>{label}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </Section>
+
+          {/* ₹99 Store / value meals */}
+          <Section style={fadeOpacity(2)}>
+            <ValueMealsBanner />
+          </Section>
+
+          {/* Popular cuisines */}
+          <Section style={fadeOpacity(3)}>
+            <PopularCuisinesStrip />
+          </Section>
+
+          {/* Popular brands */}
           <Section style={fadeOpacity(4)}>
             <BrandsStrip onPress={() => router.push('/search')} />
           </Section>
 
-          {/* Section 6: Promo Banner #1 — "Stock up on snack time!" */}
+          {/* Restaurants delivering to you */}
           <Section style={fadeOpacity(5)}>
-            {promoBanners[0] ? <PromoBanner banner={promoBanners[0]} /> : null}
+            <RestaurantsDeliveringBanner />
+          </Section>
+          <Section style={fadeOpacity(5)}>
+            {!loading && allStores.length > 0 && (
+              <TopStoresList
+                stores={allStores.slice(0, 4)}
+                onPress={(s) => router.push(`/store/${s.id}`)}
+              />
+            )}
           </Section>
 
-          {/* Section 7: Grocery & Kitchen Category Grid */}
+          {/* Grocery & Kitchen */}
           <Section style={fadeOpacity(6)}>
             {loading ? (
               <View style={styles.section}>
@@ -459,38 +431,8 @@ export default function HomeScreen() {
             )}
           </Section>
 
-          {/* NEW: Top Restaurants List (Zomato-style) */}
+          {/* Featured */}
           <Section style={fadeOpacity(7)}>
-            {!loading && allStores.length > 0 && (
-              <TopStoresList
-                stores={allStores.slice(0, 4)}
-                onPress={(s) => router.push(`/store/${s.id}`)}
-              />
-            )}
-          </Section>
-
-          {/* NEW: Restaurants Delivering To You count banner */}
-          <Section style={fadeOpacity(7)}>
-            <RestaurantsDeliveringBanner />
-          </Section>
-
-          {/* NEW: Popular Cuisines strip */}
-          <Section style={fadeOpacity(7)}>
-            <PopularCuisinesStrip />
-          </Section>
-
-          {/* NEW: 99 Store / Value Meals banner */}
-          <Section style={fadeOpacity(8)}>
-            <ValueMealsBanner />
-          </Section>
-
-          {/* NEW: Trending Recipes — cook tonight's dinner */}
-          <Section style={fadeOpacity(7)}>
-            <TrendingRecipes />
-          </Section>
-
-          {/* Section 8: Featured This Week — blue-bordered carousel */}
-          <Section style={fadeOpacity(8)}>
             {loading ? (
               <View style={styles.section}>
                 <View style={styles.skelHeader}>
@@ -508,74 +450,28 @@ export default function HomeScreen() {
             )}
           </Section>
 
-          {/* NEW: Cashback Banner */}
-          <Section style={fadeOpacity(8)}>
-            <View style={{ marginTop: 16 }}>
-              <CashbackBanner onPress={() => router.push('/wallet')} />
-            </View>
-          </Section>
-
-          {/* Section 9: Festival Tile #1 (Navratri — orange/yellow) */}
-          <Section style={fadeOpacity(9)}>
-            {festivalTiles[0] ? <FestivalTile tile={festivalTiles[0]} /> : null}
-          </Section>
-
-          {/* Section 10: Product Carousel Row (frozen desserts, with chips) */}
-          <Section style={fadeOpacity(10)}>
-            {carouselRows[0] ? (
+          {/* Admin-configured carousel rows */}
+          {carouselRows.map((row, i) => (
+            <Section key={row.id} style={fadeOpacity(8 + i)}>
               <ProductCarouselRow
-                title={carouselRows[0].title}
-                subtitle={carouselRows[0].subtitle}
-                emoji={carouselRows[0].emoji}
-                products={carouselProducts[carouselRows[0].id] || []}
+                title={row.title}
+                subtitle={row.subtitle}
+                emoji={row.emoji}
+                products={carouselProducts[row.id] || []}
                 store={defaultStore}
-                chips={carouselRows[0].chips}
-                isLoading={loading}
+                chips={row.chips}
+                isLoading={i === 0 ? loading : undefined}
                 onSeeAll={() => router.push('/search')}
               />
-            ) : null}
-          </Section>
+            </Section>
+          ))}
 
-          {/* NEW: Membership Card */}
-          <Section style={fadeOpacity(10)}>
-            <View style={{ marginTop: 16 }}>
-              <MembershipCard onPress={() => router.push('/wallet')} />
-            </View>
-          </Section>
-
-          {/* Section 11: Snacks & Drinks Category Grid */}
-          <Section style={fadeOpacity(11)}>
-            {loading ? (
-              <View style={styles.section}>
-                <View style={styles.skelHeader}>
-                  <SkeletonShimmer width={160} height={20} />
-                </View>
-                <View style={styles.catGridSkel}>
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonShimmer key={i} width="23%" height={84} radius={14} />
-                  ))}
-                </View>
-              </View>
-            ) : (
-              <CategoryGrid
-                title="Snacks & Drinks"
-                subtitle="Munchies & sips for every craving"
-                categories={snacksCats}
-                tileBg="#FFF7E6"
-                onSeeAll={() => router.push('/(tabs)/categories')}
-                onTilePress={(c) =>
-                  router.push(`/search?q=${encodeURIComponent(c.name)}`)
-                }
-              />
-            )}
-          </Section>
-
-          {/* NEW: Active Coupons Strip */}
+          {/* Coupons */}
           <Section style={fadeOpacity(11)}>
             <PromoCodeStrip />
           </Section>
 
-          {/* Section 12: Product Grid — Stock up on crunchy snacks */}
+          {/* Product grid */}
           <Section style={fadeOpacity(12)}>
             {loading ? (
               <View style={styles.section}>
@@ -598,7 +494,7 @@ export default function HomeScreen() {
             )}
           </Section>
 
-          {/* NEW: Recently Viewed Strip */}
+          {/* Recently viewed */}
           <Section style={fadeOpacity(13)}>
             {!loading && recentlyViewed.length > 0 && (
               <RecentlyViewedStrip
@@ -607,33 +503,6 @@ export default function HomeScreen() {
               />
             )}
           </Section>
-
-          {/* Section 13: Festival Tile #2 — Durga Pujo Bazar (red themed) */}
-          <Section style={fadeOpacity(14)}>
-            {festivalTiles[1] ? <FestivalTile tile={festivalTiles[1]} /> : null}
-          </Section>
-
-          {/* Extra: Additional Product Carousel Rows (admin-configured) */}
-          {carouselRows.slice(1).map((row, i) => (
-            <Section key={row.id} style={fadeOpacity(14 + i + 1)}>
-              <ProductCarouselRow
-                title={row.title}
-                subtitle={row.subtitle}
-                emoji={row.emoji}
-                products={carouselProducts[row.id] || []}
-                store={defaultStore}
-                chips={row.chips}
-                onSeeAll={() => router.push('/search')}
-              />
-            </Section>
-          ))}
-
-          {/* Extra: Second promo banner (Kellogg's brand ad) for variety */}
-          {promoBanners[1] ? (
-            <Section style={fadeOpacity(TOTAL_STAGES)}>
-              <PromoBanner banner={promoBanners[1]} />
-            </Section>
-          ) : null}
 
           {/* Section 14: See all products pill at the bottom */}
           <View style={styles.bottomPill}>
@@ -710,6 +579,7 @@ const HERO_BANNER_IMAGES: Record<string, any> = {
 
 function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
   const router = useRouter();
+  const colors = useThemeColors();
   const [idx, setIdx] = React.useState(0);
   const fade = React.useRef(new Animated.Value(1)).current;
 
@@ -737,7 +607,6 @@ function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
 
   const banner = banners[idx] || banners[0];
   if (!banner) return null;
-  const [c1, c2] = banner.gradient;
   const heroImage = HERO_BANNER_IMAGES[banner.tab] || HERO_BANNER_IMAGES.all;
 
   return (
@@ -746,62 +615,29 @@ function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
         onPress={() => router.push('/search')}
         style={({ pressed }: { pressed: boolean }) => [
           styles.heroCard,
-          {
-            backgroundColor: c1,
-            shadowColor: c2,
-            shadowOpacity: 0.4,
-            shadowRadius: 12,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 5,
-            opacity: pressed ? 0.92 : 1
-          }
+          { backgroundColor: colors.surfaceAlt, opacity: pressed ? 0.94 : 1 }
         ]}
       >
-        {/* Real food image as background (right side) */}
-        <View style={styles.heroImageWrap}>
-          <Image
-            source={heroImage}
-            style={styles.heroImage}
-            contentFit="cover"
-            transition={300}
-          />
-          {/* Gradient scrim over image for text legibility */}
-          <View style={[styles.heroImageScrim, { backgroundColor: c2 }]} />
-        </View>
-
-        {/* Decorative overlay tint */}
-        <View style={[styles.heroOverlay, { backgroundColor: c2, opacity: 0.55 }]} />
+        <Image source={heroImage} style={StyleSheet.absoluteFill} contentFit="cover" transition={300} />
+        {/* Dark scrim for legibility */}
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.55)' }]} />
 
         <Animated.View style={[styles.heroContent, { opacity: fade }]}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.heroTitle} numberOfLines={2}>
-              {banner.title}
-            </Text>
-            <Text style={styles.heroSubtitle} numberOfLines={2}>
-              {banner.subtitle}
-            </Text>
-            <View style={styles.heroCta}>
-              <Text style={[styles.heroCtaText, { color: '#101828' }]}>{banner.ctaText}</Text>
-              <ChevronRight
-                size={12}
-                color="#101828"
-                strokeWidth={3}
-                style={{ marginLeft: 2 }}
-              />
-            </View>
+          <View style={[styles.heroTag, { backgroundColor: colors.primary }]}>
+            <Text style={styles.heroTagText}>NEW LAUNCH</Text>
           </View>
-          {/* Real circular food image instead of emoji */}
-          <View style={styles.heroImageCircle}>
-            <Image
-              source={heroImage}
-              style={styles.heroCircleImg}
-              contentFit="cover"
-              transition={200}
-            />
+          <Text style={styles.heroTitle} numberOfLines={2}>
+            {banner.title}
+          </Text>
+          <Text style={styles.heroSubtitle} numberOfLines={2}>
+            {banner.subtitle}
+          </Text>
+          <View style={[styles.heroCta, { backgroundColor: colors.primary }]}>
+            <Text style={styles.heroCtaText}>{banner.ctaText}</Text>
+            <ChevronRight size={14} color="#fff" strokeWidth={3} style={{ marginLeft: 4 }} />
           </View>
         </Animated.View>
 
-        {/* Dot indicators (only when multiple banners) */}
         {banners.length > 1 && (
           <View style={styles.heroDots}>
             {banners.map((_, i) => (
@@ -810,9 +646,8 @@ function HeroCarousel({ banners }: { banners: HeroBannerData[] }) {
                 style={[
                   styles.heroDot,
                   {
-                    backgroundColor:
-                      i === idx ? '#fff' : 'rgba(255,255,255,0.45)',
-                    width: i === idx ? 16 : 6
+                    backgroundColor: i === idx ? colors.primary : 'rgba(255,255,255,0.4)',
+                    width: i === idx ? 18 : 6
                   }
                 ]}
               />
@@ -831,105 +666,55 @@ const styles = StyleSheet.create({
     flex: 1
   },
   heroWrap: {
-    marginTop: 8
+    marginTop: 4
   },
   heroSection: {
-    paddingHorizontal: 16
+    paddingHorizontal: 12
   },
   heroCard: {
-    borderRadius: 18,
-    padding: 18,
+    borderRadius: 22,
     overflow: 'hidden',
-    position: 'relative'
-  },
-  heroOverlay: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: '45%',
-    borderTopLeftRadius: 100,
-    borderBottomLeftRadius: 100
+    minHeight: 200,
+    justifyContent: 'flex-end'
   },
   heroContent: {
-    flexDirection: 'row',
-    alignItems: 'center'
+    padding: 18,
+    paddingBottom: 30
   },
+  heroTag: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginBottom: 8
+  },
+  heroTagText: { fontSize: 9, fontWeight: '800', color: '#fff', letterSpacing: 0.6 },
   heroTitle: {
-    fontSize: 22,
-    fontWeight: '900',
+    fontSize: 24,
+    fontWeight: '800',
     color: '#fff',
     letterSpacing: -0.4,
-    lineHeight: 26
+    lineHeight: 29
   },
   heroSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.92)',
+    color: 'rgba(255,255,255,0.82)',
     marginTop: 4
   },
   heroCta: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
     borderRadius: 999,
     marginTop: 12
   },
-  heroCtaText: {
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 0.3
-  },
-  heroEmoji: {
-    fontSize: 64,
-    marginLeft: 8
-  },
-  heroImageWrap: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: '45%',
-    borderTopLeftRadius: 100,
-    borderBottomLeftRadius: 100,
-    overflow: 'hidden',
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  heroImageScrim: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    opacity: 0.35,
-  },
-  heroImageCircle: {
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    marginLeft: 8,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.85)',
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
-  },
-  heroCircleImg: {
-    width: '100%',
-    height: '100%',
-  },
+  heroCtaText: { fontSize: 13, fontWeight: '800', color: '#fff' },
   heroDots: {
     position: 'absolute',
-    bottom: 10,
-    left: 18,
+    bottom: 12,
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4
@@ -938,6 +723,21 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3
   },
+  filterRow: {
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    gap: 8
+  },
+  filterPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 999,
+    borderWidth: 1
+  },
+  filterText: { fontSize: 12.5, fontWeight: '600' },
   section: {
     marginTop: 22
   },

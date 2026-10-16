@@ -19,7 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   splash: {
     image: './assets/splash.png',
     resizeMode: 'contain',
-    backgroundColor: '#10B981'
+    backgroundColor: '#0F0F0F'
   },
   ios: {
     supportsTablet: true,
@@ -31,7 +31,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: '#10B981'
+      backgroundColor: '#0F0F0F'
     },
     package: 'com.foodmunch.customer',
     permissions: [
@@ -63,7 +63,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-notifications',
       {
-        color: '#10B981',
+        color: '#0F0F0F',
         defaultChannel: 'orders'
       }
     ],

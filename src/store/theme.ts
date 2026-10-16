@@ -50,10 +50,10 @@ function pickColors(effective: EffectiveMode): ThemeColors {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      mode: 'system',
-      effective: 'light',
-      colors: lightColors,
-      systemScheme: 'light',
+      mode: 'dark',
+      effective: 'dark',
+      colors: darkColors,
+      systemScheme: 'dark',
       setMode: (m) => {
         const sys = get().systemScheme;
         const eff = resolveEffective(m, sys);
